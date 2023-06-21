@@ -1,0 +1,70 @@
+<?php
+
+namespace Enjin\Platform\Marketplace\Tests\Feature\GraphQL\Mutations;
+
+use Enjin\Platform\Marketplace\Tests\Feature\GraphQL\TestCaseGraphQL;
+use Illuminate\Support\Str;
+
+class FinalizeAuctionTest extends TestCaseGraphQL
+{
+    /**
+     * The graphql method.
+     */
+    protected string $method = 'FinalizeAuction';
+
+    public function test_it_can_finalize_auction(): void
+    {
+        $listing = $this->createListing();
+        $response = $this->graphql(
+            $this->method,
+            $params = ['listingId' => $listing->listing_id]
+        );
+        $this->assertEquals(
+            $response['encodedData'],
+            $this->service->finalizeAuction($params)->encoded_data
+        );
+    }
+
+    public function test_it_will_fail_with_invalid_parameter_listing_id(): void
+    {
+        $response = $this->graphql(
+            $this->method,
+            ['listingId' => null],
+            true
+        );
+        $this->assertEquals(
+            'Variable "$listingId" of non-null type "String!" must not be null.',
+            $response['error']
+        );
+
+        $response = $this->graphql(
+            $this->method,
+            ['listingId' => ''],
+            true
+        );
+        $this->assertArraySubset(
+            ['listingId' => ['The listing id field must have a value.']],
+            $response['error']
+        );
+
+        $response = $this->graphql(
+            $this->method,
+            ['listingId' => Str::random(300)],
+            true
+        );
+        $this->assertArraySubset(
+            ['listingId' => ['The listing id field must not be greater than 255 characters.']],
+            $response['error']
+        );
+
+        $response = $this->graphql(
+            $this->method,
+            ['listingId' => Str::random(255)],
+            true
+        );
+        $this->assertArraySubset(
+            ['listingId' => ['The selected listing id is invalid.']],
+            $response['error']
+        );
+    }
+}

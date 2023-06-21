@@ -1,0 +1,17 @@
+mutation FillListing($listingId: String!, $amount: BigInt!) {
+  FillListing(listingId: $listingId, amount: $amount) {
+    id
+    transactionId
+    transactionHash
+    state
+    encodedData
+    method
+    wallet {
+      account {
+        publicKey
+        address
+      }
+    }
+    idempotencyKey
+  }
+}

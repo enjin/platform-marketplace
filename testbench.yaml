@@ -1,0 +1,15 @@
+env:
+  - APP_ENV="local"
+  - APP_DEBUG="true"
+  - DB_CONNECTION="mysql"
+  - DB_DATABASE="platform"
+  - DB_USERNAME="root"
+  - DB_PASSWORD="password"
+  - CACHE_DRIVER="redis"
+  - QUEUE_CONNECTION="redis"
+  - CHAIN="substrate"
+  - NETWORK="developer"
+  - DAEMON_ACCOUNT="0x6a03b1a3d40d7e344dfb27157931b14b59fe2ff11d7352353321fe400e956802"
+
+providers:
+  - Enjin\Platform\CoreServiceProvider

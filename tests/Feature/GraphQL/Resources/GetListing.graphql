@@ -1,0 +1,77 @@
+query GetListing($id: BigInt, $listingId: String) {
+  GetListing(id: $id, listingId: $listingId) {
+    listingId
+    makeAssetId {
+      collectionId
+      tokenId
+    }
+    takeAssetId {
+      collectionId
+      tokenId
+    }
+    amount
+    price
+    minTakeValue
+    feeSide
+    creationBlock
+    deposit
+    salt
+    state {
+      ... on FixedPriceState {
+        amountFilled
+        type
+      }
+      ... on AuctionState {
+        type
+      }
+    }
+    data {
+      ... on FixedPriceData {
+        type
+      }
+      ... on AuctionData {
+        type
+        startBlock
+        endBlock
+      }
+    }
+    seller {
+      account {
+        publicKey
+        address
+      }
+    }
+    sales {
+      edges {
+        node {
+          amount
+          price
+          bidder {
+            account {
+              publicKey
+              address
+            }
+          }
+        }
+      }
+    }
+    bids {
+      edges {
+        node {
+          price
+          bidder {
+            account {
+              publicKey
+              address
+            }
+          }
+          height
+        }
+      }
+    }
+    states {
+      state
+      height
+    }
+  }
+}

@@ -1,0 +1,17 @@
+mutation PlaceBid($listingId: String!, $price: BigInt!) {
+  PlaceBid(listingId: $listingId, price: $price) {
+    id
+    transactionId
+    transactionHash
+    state
+    encodedData
+    method
+    wallet {
+      account {
+        publicKey
+        address
+      }
+    }
+    idempotencyKey
+  }
+}

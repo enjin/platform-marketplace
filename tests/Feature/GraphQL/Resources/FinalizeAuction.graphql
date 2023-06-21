@@ -1,0 +1,17 @@
+mutation FinalizeAuction($listingId: String!) {
+  FinalizeAuction(listingId: $listingId) {
+    id
+    transactionId
+    transactionHash
+    state
+    encodedData
+    method
+    wallet {
+      account {
+        publicKey
+        address
+      }
+    }
+    idempotencyKey
+  }
+}
