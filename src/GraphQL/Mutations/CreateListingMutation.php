@@ -105,7 +105,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
     {
         $makeOrTake = $isMake ? 'makeAssetId' : 'takeAssetId';
 
-        return [
+        return $collectionId == 0 ? [] : [
             $makeOrTake => new TokenExistsInCollection($collectionId),
             $makeOrTake . '.collectionId' => [
                 'bail',
