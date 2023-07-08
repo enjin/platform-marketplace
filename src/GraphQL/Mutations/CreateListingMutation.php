@@ -101,11 +101,11 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         );
     }
 
-    protected function makeOrTakeRule(string $collectionId, bool $isMake): array
+    protected function makeOrTakeRule(?string $collectionId = null, ?bool $isMake = true): array
     {
         $makeOrTake = $isMake ? 'makeAssetId' : 'takeAssetId';
 
-        return $collectionId == 0 ? [] : [
+        return $collectionId === '0' ? [] : [
             $makeOrTake . '.collectionId' => [
                 'bail',
                 'required_with:' . $makeOrTake . '.tokenId',
@@ -121,7 +121,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
      */
     protected function rules(array $args = []): array
     {
-        $makeRule = $this->makeOrTakeRule($makeCollection = Arr::get($args, 'makeAssetId.collectionId'), true);
+        $makeRule = $this->makeOrTakeRule($makeCollection = Arr::get($args, 'makeAssetId.collectionId'));
         $takeRule = $this->makeOrTakeRule($takeCollection = Arr::get($args, 'takeAssetId.collectionId'), false);
 
         return [
