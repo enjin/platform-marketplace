@@ -106,7 +106,6 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         $makeOrTake = $isMake ? 'makeAssetId' : 'takeAssetId';
 
         return $collectionId == 0 ? [] : [
-            $makeOrTake => new TokenExistsInCollection($collectionId),
             $makeOrTake . '.collectionId' => [
                 'bail',
                 'required_with:' . $makeOrTake . '.tokenId',
@@ -122,8 +121,8 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
      */
     protected function rules(array $args = []): array
     {
-        $makeRule = $this->makeOrTakeRule(Arr::get($args, 'makeAssetId.collectionId'), true);
-        $takeRule = $this->makeOrTakeRule(Arr::get($args, 'takeAssetId.collectionId'), false);
+        $makeRule = $this->makeOrTakeRule($makeCollection = Arr::get($args, 'makeAssetId.collectionId'), true);
+        $takeRule = $this->makeOrTakeRule($takeCollection = Arr::get($args, 'takeAssetId.collectionId'), false);
 
         return [
             'account' => [
@@ -132,8 +131,10 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 'max:255',
                 new ValidSubstrateAddress(),
             ],
+            'makeAssetId' => new TokenExistsInCollection($makeCollection),
             ...$makeRule,
             ...$this->getTokenFieldRules('makeAssetId'),
+            'takeAssetId' => new TokenExistsInCollection($takeCollection),
             ...$takeRule,
             ...$this->getTokenFieldRules('takeAssetId'),
             'amount' => [
