@@ -29,6 +29,10 @@ class TokenExistsInCollection implements ValidationRule
             return;
         }
 
+        if ($this->collectionId == 0 && $this->encodeTokenId($value) == 0) {
+            return;
+        }
+
         if (!resolve(TokenService::class)->tokenExistsInCollection($this->encodeTokenId($value), $this->collectionId)) {
             $fail('enjin-platform::validation.token_exists_in_collection')->translate();
         }
