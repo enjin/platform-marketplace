@@ -101,11 +101,30 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         );
     }
 
+    protected function makeOrTakeRule(string $collectionId, bool $isMake): array
+    {
+        $makeOrTake = $isMake ? 'makeAssetId' : 'takeAssetId';
+
+        return [
+            $makeOrTake => new TokenExistsInCollection($collectionId),
+            $makeOrTake . '.collectionId' => [
+                'bail',
+                'required_with:' . $makeOrTake . '.tokenId',
+                new MinBigInt(),
+                new MaxBigInt(Hex::MAX_UINT128),
+                Rule::exists('collections', 'collection_chain_id'),
+            ],
+        ];
+    }
+
     /**
      * Get the mutation's request validation rules.
      */
     protected function rules(array $args = []): array
     {
+        $makeRule = $this->makeOrTakeRule(Arr::get($args, 'makeAssetId.collectionId'), true);
+        $takeRule = $this->makeOrTakeRule(Arr::get($args, 'takeAssetId.collectionId'), false);
+
         return [
             'account' => [
                 'bail',
@@ -113,24 +132,10 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 'max:255',
                 new ValidSubstrateAddress(),
             ],
-            'makeAssetId.collectionId' => [
-                'bail',
-                'required_with:makeAssetId.tokenId',
-                new MinBigInt(),
-                new MaxBigInt(Hex::MAX_UINT128),
-                Rule::exists('collections', 'collection_chain_id'),
-            ],
+            ...$makeRule,
             ...$this->getTokenFieldRules('makeAssetId'),
-            'makeAssetId' => new TokenExistsInCollection(Arr::get($args, 'makeAssetId.collectionId')),
-            'takeAssetId.collectionId' => [
-                'bail',
-                'required_with:takeAsset.tokenId',
-                new MinBigInt(),
-                new MaxBigInt(Hex::MAX_UINT128),
-                Rule::exists('collections', 'collection_chain_id'),
-            ],
+            ...$takeRule,
             ...$this->getTokenFieldRules('takeAssetId'),
-            'takeAssetId' => new TokenExistsInCollection(Arr::get($args, 'takeAssetId.collectionId')),
             'amount' => [
                 'bail',
                 new MinBigInt(1),
