@@ -8,7 +8,7 @@ env:
   - CACHE_DRIVER="redis"
   - QUEUE_CONNECTION="redis"
   - CHAIN="substrate"
-  - NETWORK="developer"
+  - NETWORK="polkadot"
   - DAEMON_ACCOUNT="0x6a03b1a3d40d7e344dfb27157931b14b59fe2ff11d7352353321fe400e956802"
 
 providers:
