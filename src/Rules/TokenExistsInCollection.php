@@ -25,7 +25,11 @@ class TokenExistsInCollection implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!$this->collectionId) {
+        if (is_null($this->collectionId)) {
+            return;
+        }
+
+        if ($this->collectionId == 0 && $this->encodeTokenId($value) == 0) {
             return;
         }
 
