@@ -25,13 +25,6 @@
         "ext-openssl": "*",
         "ext-gmp": "*",
         "enjin/platform-core": "*",
-        "amphp/amp": "^3.0",
-        "amphp/http": "2.x-dev#b9f04ee",
-        "amphp/http-client": "v5.x-dev#149cc0f",
-        "amphp/parallel": "^2.0",
-        "amphp/socket": "^2.0",
-        "amphp/websocket": "v2.x-dev#1bdf01a",
-        "amphp/websocket-client": "v2.x-dev#89f6a4a",
         "rebing/graphql-laravel": "^9.0.0-rc1",
         "spatie/laravel-package-tools": "^1.0",
         "spatie/laravel-ray": "^1.0",
@@ -74,12 +67,6 @@
             ]
         }
     },
-    "repositories": [
-        {
-        "type": "vcs",
-        "url": "git@github.com:enjin/platform-core.git"
-        }
-    ],
     "minimum-stability": "dev",
     "prefer-stable": false,
     "require-dev": {
