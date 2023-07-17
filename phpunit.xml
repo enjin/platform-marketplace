@@ -30,5 +30,11 @@
     <include>
       <directory suffix=".php">./src</directory>
     </include>
+    <exclude>
+        <directory>./src/Commands</directory>
+        <directory>./src/Enums</directory>
+        <directory>./src/Events</directory>
+        <directory>./src/Exceptions</directory>
+    </exclude>
   </source>
 </phpunit>
