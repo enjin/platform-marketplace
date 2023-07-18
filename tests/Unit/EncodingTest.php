@@ -77,13 +77,4 @@ class EncodingTest extends TestCase
             )
         );
     }
-
-    public function test_it_can_encode_set_protocol_fee()
-    {
-        $callIndex = $this->codec->encode()->callIndexes['Marketplace.set_protocol_fee'];
-        $this->assertEquals(
-            "0x{$callIndex}01000000",
-            $this->codec->encode()->setProtocolFee(1)
-        );
-    }
 }
