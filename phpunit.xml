@@ -35,6 +35,7 @@
         <directory>./src/Enums</directory>
         <directory>./src/Events</directory>
         <directory>./src/Exceptions</directory>
+        <directory>./src/Services/Processor</directory>
     </exclude>
   </source>
 </phpunit>
