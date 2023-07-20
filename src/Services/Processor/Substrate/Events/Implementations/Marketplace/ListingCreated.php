@@ -4,6 +4,7 @@ namespace Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Impleme
 
 use Carbon\Carbon;
 use Enjin\BlockchainTools\HexConverter;
+use Enjin\Platform\Marketplace\Enums\FeeSide;
 use Enjin\Platform\Marketplace\Enums\ListingType;
 use Enjin\Platform\Marketplace\Events\Substrate\Marketplace\ListingCreated as ListingCreatedEvent;
 use Enjin\Platform\Marketplace\Models\MarketplaceListing;
@@ -44,7 +45,7 @@ class ListingCreated implements SubstrateEvent
             'amount' => $event->amount,
             'price' => $event->price,
             'min_take_value' => $event->minTakeValue,
-            'fee_side' => $event->feeSide,
+            'fee_side' => FeeSide::tryFrom($event->feeSide)?->name,
             'creation_block' => $event->creationBlock,
             'deposit' => $event->deposit,
             'salt' => HexConverter::bytesToHex($event->salt),
