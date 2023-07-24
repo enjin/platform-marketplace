@@ -2,6 +2,9 @@
 
 namespace Enjin\Platform\Marketplace\Tests\Feature\GraphQL\Mutations;
 
+use Enjin\Platform\Marketplace\Enums\ListingState;
+use Enjin\Platform\Marketplace\Models\MarketplaceListing;
+use Enjin\Platform\Marketplace\Models\MarketplaceState;
 use Enjin\Platform\Marketplace\Tests\Feature\GraphQL\TestCaseGraphQL;
 use Illuminate\Support\Str;
 
@@ -64,6 +67,21 @@ class CancelListingTest extends TestCaseGraphQL
         );
         $this->assertArraySubset(
             ['listingId' => ['The selected listing id is invalid.']],
+            $response['error']
+        );
+
+        $listing = MarketplaceListing::factory()->create(['seller_wallet_id' => $this->wallet->id]);
+        MarketplaceState::create([
+            'state' => ListingState::CANCELLED->name,
+            'marketplace_listing_id' => $listing->id,
+        ]);
+        $response = $this->graphql(
+            $this->method,
+            ['listingId' => $listing->listing_id],
+            true
+        );
+        $this->assertArraySubset(
+            ['listingId' => ['The listing is already cancelled.']],
             $response['error']
         );
     }
