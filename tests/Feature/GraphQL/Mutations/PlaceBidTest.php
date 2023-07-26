@@ -2,6 +2,8 @@
 
 namespace Enjin\Platform\Marketplace\Tests\Feature\GraphQL\Mutations;
 
+use Enjin\Platform\Marketplace\Enums\ListingState;
+use Enjin\Platform\Marketplace\Models\MarketplaceState;
 use Enjin\Platform\Marketplace\Tests\Feature\GraphQL\TestCaseGraphQL;
 use Enjin\Platform\Support\Hex;
 use Illuminate\Support\Str;
@@ -74,7 +76,7 @@ class PlaceBidTest extends TestCaseGraphQL
     public function test_it_will_fail_with_invalid_parameter_price(): void
     {
         $listing = $this->createListing();
-        $data = ['listingId' => $listing->listing_id, 'price' => fake()->numberBetween(1, 1000)];
+        $data = ['listingId' => $listing->listing_id, 'price' => $price = fake()->numberBetween(1, 1000)];
         $response = $this->graphql(
             $this->method,
             array_merge($data, ['price' => null]),
@@ -102,6 +104,30 @@ class PlaceBidTest extends TestCaseGraphQL
         );
         $this->assertStringContainsString(
             'Cannot represent following value as uint256: 1.1579208923732E+77',
+            $response['error']
+        );
+
+        $response = $this->graphql(
+            $this->method,
+            array_merge($data, ['price' => $listing->price - 1]),
+            true
+        );
+        $this->assertArraySubset(
+            ['price' => ["The minimum bidding price is {$listing->price}."]],
+            $response['error']
+        );
+
+        MarketplaceState::create([
+            'state' => ListingState::CANCELLED->name,
+            'marketplace_listing_id' => $listing->id,
+        ]);
+        $response = $this->graphql(
+            $this->method,
+            $data,
+            true
+        );
+        $this->assertArraySubset(
+            ['listingId' => ['The listing is already cancelled.']],
             $response['error']
         );
     }

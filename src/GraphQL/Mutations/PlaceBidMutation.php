@@ -5,6 +5,8 @@ namespace Enjin\Platform\Marketplace\GraphQL\Mutations;
 use Closure;
 use Enjin\Platform\GraphQL\Types\Input\Substrate\Traits\HasIdempotencyField;
 use Enjin\Platform\Interfaces\PlatformBlockchainTransaction;
+use Enjin\Platform\Marketplace\Rules\ListingNotCancelled;
+use Enjin\Platform\Marketplace\Rules\MinimumPrice;
 use Enjin\Platform\Marketplace\Services\TransactionService;
 use Enjin\Platform\Models\Transaction;
 use Enjin\Platform\Rules\MaxBigInt;
@@ -12,7 +14,6 @@ use Enjin\Platform\Rules\MinBigInt;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class PlaceBidMutation extends Mutation implements PlatformBlockchainTransaction
@@ -83,12 +84,13 @@ class PlaceBidMutation extends Mutation implements PlatformBlockchainTransaction
                 'bail',
                 'filled',
                 'max:255',
-                Rule::exists('marketplace_listings', 'listing_id'),
+                new ListingNotCancelled(),
             ],
             'price' => [
                 'bail',
                 new MinBigInt(1),
                 new MaxBigInt(),
+                new MinimumPrice(),
             ],
         ];
     }
