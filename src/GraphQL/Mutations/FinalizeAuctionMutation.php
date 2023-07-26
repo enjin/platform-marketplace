@@ -5,12 +5,12 @@ namespace Enjin\Platform\Marketplace\GraphQL\Mutations;
 use Closure;
 use Enjin\Platform\GraphQL\Types\Input\Substrate\Traits\HasIdempotencyField;
 use Enjin\Platform\Interfaces\PlatformBlockchainTransaction;
+use Enjin\Platform\Marketplace\Rules\ListingNotCancelled;
 use Enjin\Platform\Marketplace\Services\TransactionService;
 use Enjin\Platform\Models\Transaction;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class FinalizeAuctionMutation extends Mutation implements PlatformBlockchainTransaction
@@ -77,7 +77,7 @@ class FinalizeAuctionMutation extends Mutation implements PlatformBlockchainTran
                 'bail',
                 'filled',
                 'max:255',
-                Rule::exists('marketplace_listings', 'listing_id'),
+                new ListingNotCancelled(),
             ],
         ];
     }
