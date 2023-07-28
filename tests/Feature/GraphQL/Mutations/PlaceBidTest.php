@@ -76,7 +76,7 @@ class PlaceBidTest extends TestCaseGraphQL
     public function test_it_will_fail_with_invalid_parameter_price(): void
     {
         $listing = $this->createListing();
-        $data = ['listingId' => $listing->listing_id, 'price' => $price = fake()->numberBetween(1, 1000)];
+        $data = ['listingId' => $listing->listing_id, 'price' => fake()->numberBetween(1, 1000)];
         $response = $this->graphql(
             $this->method,
             array_merge($data, ['price' => null]),
@@ -107,13 +107,27 @@ class PlaceBidTest extends TestCaseGraphQL
             $response['error']
         );
 
+        $listing->load('highestBid');
+        $price = $listing?->highestBid?->price ?? $listing?->price;
         $response = $this->graphql(
             $this->method,
-            array_merge($data, ['price' => $listing->price - 1]),
+            array_merge($data, ['price' => $price - 1]),
             true
         );
         $this->assertArraySubset(
-            ['price' => ["The minimum bidding price is {$listing->price}."]],
+            ['price' => ["The minimum bidding price is {$price}."]],
+            $response['error']
+        );
+
+        $listing->bids->each->delete();
+        $price = $listing->price;
+        $response = $this->graphql(
+            $this->method,
+            array_merge($data, ['price' => $price - 1]),
+            true
+        );
+        $this->assertArraySubset(
+            ['price' => ["The minimum bidding price is {$price}."]],
             $response['error']
         );
 
