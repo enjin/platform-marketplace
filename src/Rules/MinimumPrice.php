@@ -39,9 +39,13 @@ class MinimumPrice implements DataAwareRule, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if ($listingId = Arr::get($this->data, 'listingId')) {
-            $listing = MarketplaceListing::where('listing_id', $listingId)->first();
-            if ($listing && $value < $listing->price) {
-                $fail('enjin-platform-marketplace::validation.minimum_price')->translate(['price' => $listing->price]);
+            if (!$listing = MarketplaceListing::where('listing_id', $listingId)->with('highestBid')->first()) {
+                return;
+            }
+
+            $price = $listing?->highestBid?->price ?? $listing?->price;
+            if ($value < $price) {
+                $fail('enjin-platform-marketplace::validation.minimum_price')->translate(['price' => $price]);
             }
         }
     }
