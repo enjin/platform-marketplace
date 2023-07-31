@@ -114,8 +114,9 @@ class PlaceBidTest extends TestCaseGraphQL
             array_merge($data, ['price' => $price - 1]),
             true
         );
+        $expected = bcmul($price, 1.05);
         $this->assertArraySubset(
-            ['price' => ["The minimum bidding price is {$price}."]],
+            ['price' => ["The minimum bidding price must be greater than {$expected}."]],
             $response['error']
         );
 
@@ -126,8 +127,9 @@ class PlaceBidTest extends TestCaseGraphQL
             array_merge($data, ['price' => $price - 1]),
             true
         );
+        $expected = bcmul($price, 1.05);
         $this->assertArraySubset(
-            ['price' => ["The minimum bidding price is {$price}."]],
+            ['price' => ["The minimum bidding price must be greater than {$expected}."]],
             $response['error']
         );
 
