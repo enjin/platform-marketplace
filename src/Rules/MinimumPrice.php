@@ -47,7 +47,7 @@ class MinimumPrice implements DataAwareRule, ValidationRule
                 $listing?->highestBid?->price ?? $listing?->price,
                 1.05
             );
-            if ($value < $price) {
+            if (bccomp($value, $price) < 0) {
                 $fail('enjin-platform-marketplace::validation.minimum_price')->translate(['price' => $price]);
             }
         }
