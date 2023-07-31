@@ -108,29 +108,28 @@ class PlaceBidTest extends TestCaseGraphQL
         );
 
         $listing->load('highestBid');
-        $price = bcmul(
-            $listing?->highestBid?->price ?? $listing?->price,
-            1.05
-        );
+        $price = $listing?->highestBid?->price ?? $listing?->price;
         $response = $this->graphql(
             $this->method,
             array_merge($data, ['price' => $price - 1]),
             true
         );
+        $expected = bcmul($price, 1.05);
         $this->assertArraySubset(
-            ['price' => ["The bidding price must be greater than {$price}."]],
+            ['price' => ["The bidding price must be greater than {$expected}."]],
             $response['error']
         );
 
         $listing->bids->each->delete();
-        $price = $listing->price * 1.05;
+        $price = $listing->price;
         $response = $this->graphql(
             $this->method,
             array_merge($data, ['price' => $price - 1]),
             true
         );
+        $expected = bcmul($price, 1.05);
         $this->assertArraySubset(
-            ['price' => ["The bidding price must be greater than {$price}."]],
+            ['price' => ["The bidding price must be greater than {$expected}."]],
             $response['error']
         );
 
