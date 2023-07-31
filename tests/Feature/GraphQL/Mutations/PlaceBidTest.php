@@ -108,26 +108,29 @@ class PlaceBidTest extends TestCaseGraphQL
         );
 
         $listing->load('highestBid');
-        $price = $listing?->highestBid?->price ?? $listing?->price;
+        $price = bcmul(
+            $listing?->highestBid?->price ?? $listing?->price,
+            1.05
+        );
         $response = $this->graphql(
             $this->method,
             array_merge($data, ['price' => $price - 1]),
             true
         );
         $this->assertArraySubset(
-            ['price' => ["The minimum bidding price is {$price}."]],
+            ['price' => ["The bidding price must be greater than {$price}."]],
             $response['error']
         );
 
         $listing->bids->each->delete();
-        $price = $listing->price;
+        $price = $listing->price * 1.05;
         $response = $this->graphql(
             $this->method,
             array_merge($data, ['price' => $price - 1]),
             true
         );
         $this->assertArraySubset(
-            ['price' => ["The minimum bidding price is {$price}."]],
+            ['price' => ["The bidding price must be greater than {$price}."]],
             $response['error']
         );
 
