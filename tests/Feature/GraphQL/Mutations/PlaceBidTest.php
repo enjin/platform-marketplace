@@ -116,7 +116,7 @@ class PlaceBidTest extends TestCaseGraphQL
         );
         $expected = bcmul($price, 1.05);
         $this->assertArraySubset(
-            ['price' => ["The minimum bidding price must be greater than {$expected}."]],
+            ['price' => ["The minimum bidding price must be greater than or equal to {$expected}."]],
             $response['error']
         );
 
@@ -129,7 +129,7 @@ class PlaceBidTest extends TestCaseGraphQL
         );
         $expected = bcmul($price, 1.05);
         $this->assertArraySubset(
-            ['price' => ["The minimum bidding price must be greater than {$expected}."]],
+            ['price' => ["The minimum bidding price must be greater than or equal to {$expected}."]],
             $response['error']
         );
 
