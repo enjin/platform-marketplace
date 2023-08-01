@@ -56,15 +56,15 @@ class EnoughTokenSupply implements DataAwareRule, ValidationRule
             return;
         }
 
-        $listing = MarketplaceListing::whereHas(
+        $amount = MarketplaceListing::whereDoesntHave(
             'state',
-            fn ($query) => $query->where('state', ListingState::ACTIVE->name)
-        )->firstWhere([
+            fn ($query) => $query->where('state', ListingState::CANCELLED->name)
+        )->where([
             'make_collection_chain_id' => $collectionId,
             'make_token_chain_id' => $tokenId,
-        ]);
+        ])->sum('amount');
 
-        if ($token->supply < ($value + (int) $listing?->amount)) {
+        if ($token->supply < ($value + $amount)) {
             $fail('enjin-platform-marketplace::validation.enough_token_supply')->translate();
         }
     }
