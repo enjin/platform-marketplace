@@ -256,6 +256,7 @@ class TestCaseGraphQL extends BaseTestCase
         $app->bootstrapWith([LoadEnvironmentVariables::class]);
 
         $app['config']->set('database.default', env('DB_DRIVER', 'mysql'));
+        $app->useDatabasePath(__DIR__ . '/../../../database');
         $app['config']->set('database.connections.mysql', [
             'driver' => 'mysql',
             'host' => env('DB_HOST', '127.0.0.1'),
