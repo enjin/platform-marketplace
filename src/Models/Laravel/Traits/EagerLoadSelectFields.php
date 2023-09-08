@@ -98,7 +98,8 @@ trait EagerLoadSelectFields
             $with = [
                 $key => function ($query) use ($select, $args) {
                     $query->select(array_unique($select))
-                        ->when(Arr::get($args, 'after'), fn ($q) => $q->where('id', '>', Cursor::fromEncoded($args['after'])->parameter('id')));
+                        ->when($cursor = Cursor::fromEncoded(Arr::get($args, 'after')), fn ($q) => $q->where('id', '>', $cursor->parameter('id')))
+                        ->orderBy('marketplace_listings.id');
                     // This must be done this way to load eager limit correctly.
                     if ($limit = Arr::get($args, 'first')) {
                         $query->limit($limit + 1);
@@ -155,7 +156,8 @@ trait EagerLoadSelectFields
             $with = [
                 $key => function ($query) use ($select, $args) {
                     $query->select(array_unique($select))
-                        ->when(Arr::get($args, 'after'), fn ($q) => $q->where('id', '>', Cursor::fromEncoded($args['after'])->parameter('id')));
+                        ->when($cursor = Cursor::fromEncoded(Arr::get($args, 'after')), fn ($q) => $q->where('id', '>', $cursor->parameter('id')))
+                        ->orderBy('marketplace_bids.id');
                     // This must be done this way to load eager limit correctly.
                     if ($limit = Arr::get($args, 'first')) {
                         $query->limit($limit + 1);
@@ -205,7 +207,8 @@ trait EagerLoadSelectFields
             $with = [
                 $key => function ($query) use ($select, $args) {
                     $query->select(array_unique($select))
-                        ->when(Arr::get($args, 'after'), fn ($q) => $q->where('id', '>', Cursor::fromEncoded($args['after'])->parameter('id')));
+                        ->when($cursor = Cursor::fromEncoded(Arr::get($args, 'after')), fn ($q) => $q->where('id', '>', $cursor->parameter('id')))
+                        ->orderBy('marketplace_sales.id');
                     // This must be done this way to load eager limit correctly.
                     if ($limit = Arr::get($args, 'first')) {
                         $query->limit($limit + 1);
