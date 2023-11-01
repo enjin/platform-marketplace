@@ -2,6 +2,8 @@
 
 namespace Enjin\Platform\Marketplace;
 
+use Enjin\Platform\Marketplace\Services\Processor\Substrate\Codec\Encoder as MarketplaceEncoder;
+use Enjin\Platform\Services\Processor\Substrate\Codec\Encoder as BaseEncoder;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -30,6 +32,8 @@ class MarketplaceServiceProvider extends PackageServiceProvider
     public function register()
     {
         parent::register();
+
+        BaseEncoder::setCallIndexKeys(array_merge(BaseEncoder::getCallIndexKeys(), MarketplaceEncoder::getCallIndexKeys()));
     }
 
     /**

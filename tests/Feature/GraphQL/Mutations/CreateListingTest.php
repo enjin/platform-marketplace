@@ -2,13 +2,21 @@
 
 namespace Enjin\Platform\Marketplace\Tests\Feature\GraphQL\Mutations;
 
+use Enjin\Platform\Facades\TransactionSerializer;
+use Enjin\Platform\GraphQL\Schemas\Primary\Substrate\Traits\HasEncodableTokenId;
+use Enjin\Platform\Marketplace\GraphQL\Mutations\CreateListingMutation;
+use Enjin\Platform\Marketplace\Models\Substrate\AuctionDataParams;
+use Enjin\Platform\Marketplace\Models\Substrate\MultiTokensTokenAssetIdParams;
 use Enjin\Platform\Marketplace\Tests\Feature\GraphQL\TestCaseGraphQL;
 use Enjin\Platform\Models\Block;
 use Enjin\Platform\Support\Hex;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class CreateListingTest extends TestCaseGraphQL
 {
+    use HasEncodableTokenId;
+
     /**
      * The graphql method.
      */
@@ -29,9 +37,22 @@ class CreateListingTest extends TestCaseGraphQL
             $this->method,
             $params = $this->generateParams()
         );
+
+        $params['makeAssetId'] = new MultiTokensTokenAssetIdParams(
+            Arr::get($params, 'makeAssetId.collectionId'),
+            $this->encodeTokenId(Arr::get($params, 'makeAssetId'))
+        );
+        $params['takeAssetId'] = new MultiTokensTokenAssetIdParams(
+            Arr::get($params, 'takeAssetId.collectionId'),
+            $this->encodeTokenId(Arr::get($params, 'takeAssetId'))
+        );
+        $params['auctionData'] = ($data = Arr::get($params, 'auctionData'))
+            ? new AuctionDataParams(Arr::get($params, 'auctionData.startBlock'), Arr::get($params, 'auctionData.endBlock'))
+            : null;
+
         $this->assertEquals(
             $response['encodedData'],
-            $this->service->createListing($params)->encoded_data
+            TransactionSerializer::encode($this->method, CreateListingMutation::getEncodableParams(...$params))
         );
     }
 

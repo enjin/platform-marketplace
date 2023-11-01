@@ -2,7 +2,9 @@
 
 namespace Enjin\Platform\Marketplace\Tests\Feature\GraphQL\Mutations;
 
+use Enjin\Platform\Facades\TransactionSerializer;
 use Enjin\Platform\Marketplace\Enums\ListingState;
+use Enjin\Platform\Marketplace\GraphQL\Mutations\FillListingMutation;
 use Enjin\Platform\Marketplace\Models\MarketplaceState;
 use Enjin\Platform\Marketplace\Tests\Feature\GraphQL\TestCaseGraphQL;
 use Enjin\Platform\Support\Hex;
@@ -22,9 +24,10 @@ class FillListingTest extends TestCaseGraphQL
             $this->method,
             $params = ['listingId' => $listing->listing_id, 'amount' => fake()->numberBetween(1, 1000)]
         );
+
         $this->assertEquals(
             $response['encodedData'],
-            $this->service->fillListing($params)->encoded_data
+            TransactionSerializer::encode($this->method, FillListingMutation::getEncodableParams(...$params))
         );
     }
 
