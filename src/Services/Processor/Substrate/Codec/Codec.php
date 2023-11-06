@@ -8,9 +8,6 @@ use Enjin\Platform\Services\Processor\Substrate\Codec\Codec as BaseCodec;
 
 class Codec extends BaseCodec
 {
-    protected Encoder $marketplaceEncoder;
-    protected Decoder $marketplaceDecoder;
-
     /**
      * Creates the codec instance.
      */
@@ -18,23 +15,23 @@ class Codec extends BaseCodec
     {
         parent::__construct();
 
-        $this->marketplaceEncoder = new MarketplaceEncoder($this->scaleInstance);
-        $this->marketplaceDecoder = new MarketplaceDecoder($this->scaleInstance);
+        $this->encoder = new MarketplaceEncoder($this->scaleInstance);
+        $this->decoder = new MarketplaceDecoder($this->scaleInstance);
     }
 
     /**
      * Returns the marketplace encoder.
      */
-    public function encode(): Encoder
+    public function encoder(): Encoder
     {
-        return $this->marketplaceEncoder;
+        return $this->encoder;
     }
 
     /**
      * Returns the marketplace decoder.
      */
-    public function decode(): Decoder
+    public function decoder(): Decoder
     {
-        return $this->marketplaceDecoder;
+        return $this->decoder;
     }
 }

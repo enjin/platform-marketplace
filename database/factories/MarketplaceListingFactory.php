@@ -22,7 +22,7 @@ class MarketplaceListingFactory extends Factory
     public function definition()
     {
         return [
-            'listing_id' => fake()->uuid(),
+            'listing_id' => '0x' . fake()->regexify('[a-f0-9]{64}'),
             'make_collection_chain_id' => fake()->numberBetween(1, 100),
             'make_token_chain_id' => fake()->numberBetween(1, 100),
             'take_collection_chain_id' => fake()->numberBetween(1, 100),

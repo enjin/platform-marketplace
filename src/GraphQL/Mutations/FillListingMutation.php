@@ -3,21 +3,31 @@
 namespace Enjin\Platform\Marketplace\GraphQL\Mutations;
 
 use Closure;
+use Enjin\BlockchainTools\HexConverter;
+use Enjin\Platform\Facades\TransactionSerializer;
+use Enjin\Platform\GraphQL\Schemas\Primary\Substrate\Traits\StoresTransactions;
+use Enjin\Platform\GraphQL\Schemas\Primary\Traits\HasTransactionDeposit;
 use Enjin\Platform\GraphQL\Types\Input\Substrate\Traits\HasIdempotencyField;
+use Enjin\Platform\GraphQL\Types\Input\Substrate\Traits\HasSigningAccountField;
+use Enjin\Platform\GraphQL\Types\Input\Substrate\Traits\HasSimulateField;
 use Enjin\Platform\Interfaces\PlatformBlockchainTransaction;
 use Enjin\Platform\Marketplace\Rules\ListingNotCancelled;
-use Enjin\Platform\Marketplace\Services\TransactionService;
 use Enjin\Platform\Models\Transaction;
 use Enjin\Platform\Rules\MaxBigInt;
 use Enjin\Platform\Rules\MinBigInt;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class FillListingMutation extends Mutation implements PlatformBlockchainTransaction
 {
     use HasIdempotencyField;
+    use HasSigningAccountField;
+    use HasSimulateField;
+    use HasTransactionDeposit;
+    use StoresTransactions;
 
     /**
      * Get the mutation's attributes.
@@ -52,7 +62,9 @@ class FillListingMutation extends Mutation implements PlatformBlockchainTransact
                 'type' => GraphQL::type('BigInt!'),
                 'description' => __('enjin-platform-marketplace::type.marketplace_listing.field.amount'),
             ],
+            ...$this->getSigningAccountField(),
             ...$this->getIdempotencyField(),
+            ...$this->getSimulateField(),
         ];
     }
 
@@ -65,12 +77,21 @@ class FillListingMutation extends Mutation implements PlatformBlockchainTransact
         $context,
         ResolveInfo $resolveInfo,
         Closure $getSelectFields,
-        TransactionService $transaction
     ) {
+        $encodedData = TransactionSerializer::encode($this->getMutationName(), static::getEncodableParams(...$args));
+
         return Transaction::lazyLoadSelectFields(
-            DB::transaction(fn () => $transaction->fillListing($args)),
+            DB::transaction(fn () => $this->storeTransaction($args, $encodedData)),
             $resolveInfo
         );
+    }
+
+    public static function getEncodableParams(...$params): array
+    {
+        return [
+            'listingId' => HexConverter::unPrefix(Arr::get($params, 'listingId', 0)),
+            'amount' => gmp_init(Arr::get($params, 'amount', 0)),
+        ];
     }
 
     /**

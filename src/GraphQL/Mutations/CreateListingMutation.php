@@ -3,13 +3,20 @@
 namespace Enjin\Platform\Marketplace\GraphQL\Mutations;
 
 use Closure;
+use Enjin\BlockchainTools\HexConverter;
+use Enjin\Platform\Facades\TransactionSerializer;
+use Enjin\Platform\GraphQL\Schemas\Primary\Substrate\Traits\StoresTransactions;
 use Enjin\Platform\GraphQL\Schemas\Primary\Traits\HasTokenIdFieldRules;
+use Enjin\Platform\GraphQL\Schemas\Primary\Traits\HasTransactionDeposit;
 use Enjin\Platform\GraphQL\Types\Input\Substrate\Traits\HasIdempotencyField;
+use Enjin\Platform\GraphQL\Types\Input\Substrate\Traits\HasSigningAccountField;
+use Enjin\Platform\GraphQL\Types\Input\Substrate\Traits\HasSimulateField;
 use Enjin\Platform\Interfaces\PlatformBlockchainTransaction;
+use Enjin\Platform\Marketplace\Models\Substrate\AuctionDataParams;
+use Enjin\Platform\Marketplace\Models\Substrate\MultiTokensTokenAssetIdParams;
 use Enjin\Platform\Marketplace\Rules\EnoughTokenSupply;
 use Enjin\Platform\Marketplace\Rules\FutureBlock;
 use Enjin\Platform\Marketplace\Rules\TokenExistsInCollection;
-use Enjin\Platform\Marketplace\Services\TransactionService;
 use Enjin\Platform\Models\Transaction;
 use Enjin\Platform\Rules\MaxBigInt;
 use Enjin\Platform\Rules\MinBigInt;
@@ -19,12 +26,17 @@ use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class CreateListingMutation extends Mutation implements PlatformBlockchainTransaction
 {
     use HasIdempotencyField;
+    use HasSigningAccountField;
+    use HasSimulateField;
+    use HasTransactionDeposit;
+    use StoresTransactions;
     use HasTokenIdFieldRules;
 
     /**
@@ -80,7 +92,9 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 'type' => GraphQL::type('AuctionDataInputType'),
                 'description' => __('enjin-platform-marketplace::input_type.auction_data.description'),
             ],
+            ...$this->getSigningAccountField(),
             ...$this->getIdempotencyField(),
+            ...$this->getSimulateField(),
         ];
     }
 
@@ -93,12 +107,47 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         $context,
         ResolveInfo $resolveInfo,
         Closure $getSelectFields,
-        TransactionService $transaction
     ) {
+        $encodedData = TransactionSerializer::encode($this->getMutationName(), static::getEncodableParams(
+            makeAssetId: new MultiTokensTokenAssetIdParams(
+                Arr::get($args, 'makeAssetId.collectionId'),
+                $this->encodeTokenId(Arr::get($args, 'makeAssetId'))
+            ),
+            takeAssetId: new MultiTokensTokenAssetIdParams(
+                Arr::get($args, 'takeAssetId.collectionId'),
+                $this->encodeTokenId(Arr::get($args, 'takeAssetId'))
+            ),
+            amount: Arr::get($args, 'amount'),
+            price: Arr::get($args, 'price'),
+            salt: Arr::get($args, 'salt', Str::random(10)),
+            auctionData: ($data = Arr::get($args, 'auctionData'))
+                ? new AuctionDataParams(Arr::get($data, 'startBlock'), Arr::get($data, 'endBlock'))
+                : null
+        ));
+
         return Transaction::lazyLoadSelectFields(
-            DB::transaction(fn () => $transaction->createListing($args)),
+            DB::transaction(fn () => $this->storeTransaction($args, $encodedData)),
             $resolveInfo
         );
+    }
+
+    public static function getEncodableParams(...$params): array
+    {
+        $makeAsset = Arr::get($params, 'makeAssetId', new MultiTokensTokenAssetIdParams('0', '0'));
+        $takeAsset = Arr::get($params, 'takeAssetId', new MultiTokensTokenAssetIdParams('0', '0'));
+        $amount = Arr::get($params, 'amount', 0);
+        $price = Arr::get($params, 'price', 0);
+        $salt = Arr::get($params, 'salt', Str::random(10));
+        $auctionData = Arr::get($params, 'auctionData', null);
+
+        return [
+            'makeAssetId' => $makeAsset->toEncodable(),
+            'takeAssetId' => $takeAsset->toEncodable(),
+            'amount' => gmp_init($amount),
+            'price' => gmp_init($price),
+            'salt' => HexConverter::stringToHexPrefixed($salt),
+            'auctionData' => $auctionData?->toEncodable(),
+        ];
     }
 
     protected function makeOrTakeRule(?string $collectionId = null, ?bool $isMake = true): array

@@ -2,7 +2,9 @@
 
 namespace Enjin\Platform\Marketplace\Tests\Feature\GraphQL\Mutations;
 
+use Enjin\Platform\Facades\TransactionSerializer;
 use Enjin\Platform\Marketplace\Enums\ListingState;
+use Enjin\Platform\Marketplace\GraphQL\Mutations\FinalizeAuctionMutation;
 use Enjin\Platform\Marketplace\Models\MarketplaceState;
 use Enjin\Platform\Marketplace\Tests\Feature\GraphQL\TestCaseGraphQL;
 use Illuminate\Support\Str;
@@ -23,7 +25,7 @@ class FinalizeAuctionTest extends TestCaseGraphQL
         );
         $this->assertEquals(
             $response['encodedData'],
-            $this->service->finalizeAuction($params)->encoded_data
+            TransactionSerializer::encode($this->method, FinalizeAuctionMutation::getEncodableParams(...$params))
         );
     }
 

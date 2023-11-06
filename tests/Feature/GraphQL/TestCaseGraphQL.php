@@ -9,7 +9,6 @@ use Enjin\Platform\MarketPlace\Models\MarketplaceBid;
 use Enjin\Platform\Marketplace\Models\MarketplaceListing;
 use Enjin\Platform\MarketPlace\Models\MarketplaceSale;
 use Enjin\Platform\MarketPlace\Models\MarketplaceState;
-use Enjin\Platform\Marketplace\Services\TransactionService;
 use Enjin\Platform\Marketplace\Tests\Feature\GraphQL\Traits\CreateCollectionData;
 use Enjin\Platform\Marketplace\Tests\Feature\GraphQL\Traits\CreateListingParameters;
 use Enjin\Platform\Models\Collection as LaravelCollection;
@@ -44,11 +43,6 @@ class TestCaseGraphQL extends BaseTestCase
     protected bool $fakeEvents = true;
 
     /**
-     * The transaction service.
-     */
-    protected TransactionService $service;
-
-    /**
      * Setup test case.
      */
     protected function setUp(): void
@@ -62,7 +56,6 @@ class TestCaseGraphQL extends BaseTestCase
             self::$initialized = true;
         }
         $this->createCollectionData();
-        $this->service = resolve(TransactionService::class);
     }
 
     /**

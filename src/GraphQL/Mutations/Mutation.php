@@ -41,4 +41,9 @@ abstract class Mutation extends GraphQlMutation implements PlatformGraphQlMutati
     {
         return collect(parent::getRules($arguments))->mergeRecursive(static::$adhocRules)->all();
     }
+
+    public static function getEncodableParams(...$params): array
+    {
+        return [];
+    }
 }

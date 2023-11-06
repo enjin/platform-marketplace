@@ -2,7 +2,9 @@
 
 namespace Enjin\Platform\Marketplace\Tests\Feature\GraphQL\Mutations;
 
+use Enjin\Platform\Facades\TransactionSerializer;
 use Enjin\Platform\Marketplace\Enums\ListingState;
+use Enjin\Platform\Marketplace\GraphQL\Mutations\CancelListingMutation;
 use Enjin\Platform\Marketplace\Models\MarketplaceListing;
 use Enjin\Platform\Marketplace\Models\MarketplaceState;
 use Enjin\Platform\Marketplace\Tests\Feature\GraphQL\TestCaseGraphQL;
@@ -24,7 +26,7 @@ class CancelListingTest extends TestCaseGraphQL
         );
         $this->assertEquals(
             $response['encodedData'],
-            $this->service->cancelListing($params)->encoded_data
+            TransactionSerializer::encode($this->method, CancelListingMutation::getEncodableParams(...$params))
         );
     }
 
