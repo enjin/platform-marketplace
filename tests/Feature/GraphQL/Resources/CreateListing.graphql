@@ -1,5 +1,4 @@
 mutation CreateListing(
-  $account: String!
   $makeAssetId: MultiTokenIdInput!
   $takeAssetId: MultiTokenIdInput!
   $amount: BigInt!
@@ -8,7 +7,6 @@ mutation CreateListing(
   $auctionData: AuctionDataInputType
 ) {
   CreateListing(
-    account: $account
     makeAssetId: $makeAssetId
     takeAssetId: $takeAssetId
     amount: $amount

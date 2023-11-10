@@ -56,40 +56,6 @@ class CreateListingTest extends TestCaseGraphQL
         );
     }
 
-    public function test_it_will_fail_with_invalid_parameter_account(): void
-    {
-        $data = $this->generateParams();
-        $response = $this->graphql(
-            $this->method,
-            array_merge($data, ['account' => '']),
-            true
-        );
-        $this->assertArraySubset(
-            ['account' => ['The account field must have a value.']],
-            $response['error']
-        );
-
-        $response = $this->graphql(
-            $this->method,
-            array_merge($data, ['account' => Str::random(300)]),
-            true
-        );
-        $this->assertArraySubset(
-            ['account' => ['The account field must not be greater than 255 characters.']],
-            $response['error']
-        );
-
-        $response = $this->graphql(
-            $this->method,
-            array_merge($data, ['account' => 'Invalid']),
-            true
-        );
-        $this->assertArraySubset(
-            ['account' => ['The account is not a valid substrate address.']],
-            $response['error']
-        );
-    }
-
     public function test_it_will_fail_with_invalid_parameter_make_asset_id(): void
     {
         $data = $this->generateParams();
