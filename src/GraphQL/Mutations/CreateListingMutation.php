@@ -169,12 +169,6 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         $takeRule = $this->makeOrTakeRule($takeCollection = Arr::get($args, 'takeAssetId.collectionId'), false);
 
         return [
-            'account' => [
-                'bail',
-                'filled',
-                'max:255',
-                new ValidSubstrateAddress(),
-            ],
             'makeAssetId' => new TokenExistsInCollection($makeCollection),
             ...$makeRule,
             ...$this->getTokenFieldRules('makeAssetId'),
