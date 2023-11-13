@@ -12,7 +12,6 @@ trait CreateListingParameters
     protected function generateParams(): array
     {
         return [
-            'account' => resolve(SubstrateProvider::class)->public_key(),
             'makeAssetId' => [
                 'collectionId' => $this->collection->collection_chain_id,
                 'tokenId' => ['integer' => $this->token->token_chain_id],

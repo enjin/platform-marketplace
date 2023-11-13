@@ -9,6 +9,7 @@ use Enjin\Platform\Marketplace\Models\Substrate\AuctionDataParams;
 use Enjin\Platform\Marketplace\Models\Substrate\MultiTokensTokenAssetIdParams;
 use Enjin\Platform\Marketplace\Tests\Feature\GraphQL\TestCaseGraphQL;
 use Enjin\Platform\Models\Block;
+use Enjin\Platform\Providers\Faker\SubstrateProvider;
 use Enjin\Platform\Support\Hex;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -53,6 +54,41 @@ class CreateListingTest extends TestCaseGraphQL
         $this->assertEquals(
             $response['encodedData'],
             TransactionSerializer::encode($this->method, CreateListingMutation::getEncodableParams(...$params))
+        );
+
+        $this->assertNull(Arr::get($response, 'wallet.account.publicKey'));
+    }
+
+    public function test_it_can_create_listing_with_signing_account(): void
+    {
+        $params = $this->generateParams();
+        $params['signingAccount'] = resolve(SubstrateProvider::class)->public_key();
+
+        $response = $this->graphql(
+            $this->method,
+            $params,
+        );
+
+        $params['makeAssetId'] = new MultiTokensTokenAssetIdParams(
+            Arr::get($params, 'makeAssetId.collectionId'),
+            $this->encodeTokenId(Arr::get($params, 'makeAssetId'))
+        );
+        $params['takeAssetId'] = new MultiTokensTokenAssetIdParams(
+            Arr::get($params, 'takeAssetId.collectionId'),
+            $this->encodeTokenId(Arr::get($params, 'takeAssetId'))
+        );
+        $params['auctionData'] = ($data = Arr::get($params, 'auctionData'))
+            ? new AuctionDataParams(Arr::get($params, 'auctionData.startBlock'), Arr::get($params, 'auctionData.endBlock'))
+            : null;
+
+        $this->assertEquals(
+            $response['encodedData'],
+            TransactionSerializer::encode($this->method, CreateListingMutation::getEncodableParams(...$params))
+        );
+
+        $this->assertEquals(
+            Arr::get($response, 'wallet.account.publicKey'),
+            $params['signingAccount'],
         );
     }
 
