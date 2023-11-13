@@ -2,8 +2,6 @@
 
 namespace Enjin\Platform\Marketplace\Tests\Feature\GraphQL\Traits;
 
-use Enjin\Platform\Providers\Faker\SubstrateProvider;
-
 trait CreateListingParameters
 {
     /**
