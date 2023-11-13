@@ -9,6 +9,7 @@ use Enjin\Platform\Marketplace\Models\Substrate\AuctionDataParams;
 use Enjin\Platform\Marketplace\Models\Substrate\MultiTokensTokenAssetIdParams;
 use Enjin\Platform\Marketplace\Tests\Feature\GraphQL\TestCaseGraphQL;
 use Enjin\Platform\Models\Block;
+use Enjin\Platform\Providers\Faker\SubstrateProvider;
 use Enjin\Platform\Support\Hex;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -54,39 +55,40 @@ class CreateListingTest extends TestCaseGraphQL
             $response['encodedData'],
             TransactionSerializer::encode($this->method, CreateListingMutation::getEncodableParams(...$params))
         );
+
+        $this->assertNull(Arr::get($response, 'wallet.account.publicKey'));
     }
 
-    public function test_it_will_fail_with_invalid_parameter_account(): void
+    public function test_it_can_create_listing_with_signing_account(): void
     {
-        $data = $this->generateParams();
-        $response = $this->graphql(
-            $this->method,
-            array_merge($data, ['account' => '']),
-            true
-        );
-        $this->assertArraySubset(
-            ['account' => ['The account field must have a value.']],
-            $response['error']
-        );
+        $params = $this->generateParams();
+        $params['signingAccount'] = resolve(SubstrateProvider::class)->public_key();
 
         $response = $this->graphql(
             $this->method,
-            array_merge($data, ['account' => Str::random(300)]),
-            true
-        );
-        $this->assertArraySubset(
-            ['account' => ['The account field must not be greater than 255 characters.']],
-            $response['error']
+            $params,
         );
 
-        $response = $this->graphql(
-            $this->method,
-            array_merge($data, ['account' => 'Invalid']),
-            true
+        $params['makeAssetId'] = new MultiTokensTokenAssetIdParams(
+            Arr::get($params, 'makeAssetId.collectionId'),
+            $this->encodeTokenId(Arr::get($params, 'makeAssetId'))
         );
-        $this->assertArraySubset(
-            ['account' => ['The account is not a valid substrate address.']],
-            $response['error']
+        $params['takeAssetId'] = new MultiTokensTokenAssetIdParams(
+            Arr::get($params, 'takeAssetId.collectionId'),
+            $this->encodeTokenId(Arr::get($params, 'takeAssetId'))
+        );
+        $params['auctionData'] = ($data = Arr::get($params, 'auctionData'))
+            ? new AuctionDataParams(Arr::get($params, 'auctionData.startBlock'), Arr::get($params, 'auctionData.endBlock'))
+            : null;
+
+        $this->assertEquals(
+            $response['encodedData'],
+            TransactionSerializer::encode($this->method, CreateListingMutation::getEncodableParams(...$params))
+        );
+
+        $this->assertEquals(
+            Arr::get($response, 'wallet.account.publicKey'),
+            $params['signingAccount'],
         );
     }
 
