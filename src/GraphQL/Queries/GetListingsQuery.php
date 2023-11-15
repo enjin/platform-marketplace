@@ -4,6 +4,8 @@ namespace Enjin\Platform\Marketplace\GraphQL\Queries;
 
 use Closure;
 use Enjin\Platform\GraphQL\Middleware\ResolvePage;
+use Enjin\Platform\GraphQL\Schemas\Primary\Substrate\Traits\HasEncodableTokenId;
+use Enjin\Platform\GraphQL\Schemas\Primary\Traits\HasTokenIdFieldRules;
 use Enjin\Platform\GraphQL\Types\Pagination\ConnectionInput;
 use Enjin\Platform\Marketplace\Models\MarketplaceListing;
 use Enjin\Platform\Rules\MaxBigInt;
@@ -18,6 +20,9 @@ use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class GetListingsQuery extends Query
 {
+    use HasTokenIdFieldRules;
+    use HasEncodableTokenId;
+
     protected $middleware = [
         ResolvePage::class,
     ];
@@ -60,11 +65,11 @@ class GetListingsQuery extends Query
                 'description' => __('enjin-platform-marketplace::query.get_listings.args.account'),
             ],
             'makeAssetId' => [
-                'type' => GraphQL::type('AssetInputType'),
+                'type' => GraphQL::type('MultiTokenIdInput'),
                 'description' => __('enjin-platform-marketplace::type.marketplace_listing.field.makeAssetId'),
             ],
             'takeAssetId' => [
-                'type' => GraphQL::type('AssetInputType'),
+                'type' => GraphQL::type('MultiTokenIdInput'),
                 'description' => __('enjin-platform-marketplace::type.marketplace_listing.field.takeAssetId'),
             ],
         ]);
@@ -97,13 +102,13 @@ class GetListingsQuery extends Query
                 $makeAsset = Arr::get($args, 'makeAssetId'),
                 fn ($query) => $query->where([
                     'make_collection_chain_id' =>  Arr::get($makeAsset, 'collectionId'),
-                    'make_token_chain_id' => Arr::get($makeAsset, 'tokenId'),
+                    'make_token_chain_id' => $this->encodeTokenId(Arr::get($args, 'makeAssetId')),
                 ])
             )->when(
                 $takeAsset = Arr::get($args, 'takeAssetId'),
                 fn ($query) => $query->where([
                     'take_collection_chain_id' =>  Arr::get($takeAsset, 'collectionId'),
-                    'take_token_chain_id' => Arr::get($takeAsset, 'tokenId'),
+                    'take_token_chain_id' => $this->encodeTokenId(Arr::get($args, 'takeAssetId')),
                 ])
             )->cursorPaginateWithTotalDesc('marketplace_listings.id', $args['first']);
     }
@@ -143,24 +148,14 @@ class GetListingsQuery extends Query
                 new MinBigInt(),
                 new MaxBigInt(Hex::MAX_UINT128),
             ],
-            'makeAssetId.tokenId' => [
-                'bail',
-                'required_with:makeAssetId.collectionId',
-                new MinBigInt(),
-                new MaxBigInt(Hex::MAX_UINT128),
-            ],
+            ...$this->getOptionalTokenFieldRules('makeAssetId'),
             'takeAssetId.collectionId' => [
                 'bail',
                 'required_with:takeAssetId.tokenId',
                 new MinBigInt(),
                 new MaxBigInt(Hex::MAX_UINT128),
             ],
-            'takeAssetId.tokenId' => [
-                'bail',
-                'required_with:takeAssetId.collectionId',
-                new MinBigInt(),
-                new MaxBigInt(Hex::MAX_UINT128),
-            ],
+            ...$this->getOptionalTokenFieldRules('takeAssetId'),
         ];
     }
 }
