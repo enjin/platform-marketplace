@@ -16,7 +16,7 @@ class GetListingsTest extends TestCaseGraphQL
 
     public function test_it_can_get_listings(): void
     {
-        $listings = $this->createListing(fake()->numberBetween(1, 10));
+        $listings = $this->createListing(fake()->numberBetween(1, 100));
         $response = $this->graphql(
             $this->method,
             ['account' => $this->wallet->address],
