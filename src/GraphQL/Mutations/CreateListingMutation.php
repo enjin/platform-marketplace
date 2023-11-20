@@ -65,11 +65,11 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         return [
             'makeAssetId' => [
                 'type' => GraphQL::type('MultiTokenIdInput!'),
-                'description' => __('enjin-platform-marketplace::create_listing.args.makeAsset'),
+                'description' => __('enjin-platform-marketplace::mutation.create_listing.args.makeAssetId'),
             ],
             'takeAssetId' => [
                 'type' => GraphQL::type('MultiTokenIdInput!'),
-                'description' => __('enjin-platform-marketplace::create_listing.args.takeAsset'),
+                'description' => __('enjin-platform-marketplace::mutation.create_listing.args.takeAssetId'),
             ],
             'amount' => [
                 'type' => GraphQL::type('BigInt!'),
