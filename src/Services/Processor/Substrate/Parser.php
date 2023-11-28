@@ -38,8 +38,8 @@ class Parser extends BaseParser
         $insertBids = [];
         $insertStates = [];
         foreach ($data as [$key, $listing]) {
-            $listingKey = $this->codec->decode()->listingStorageKey($key);
-            $listingData = $this->codec->decode()->listingStorageData($listing);
+            $listingKey = $this->codec->decoder()->listingStorageKey($key);
+            $listingData = $this->codec->decoder()->listingStorageData($listing);
 
             $sellerWallet = $this->getCachedWallet(
                 $user = $listingData['seller'],

@@ -38,14 +38,14 @@ class GetListingsTest extends TestCaseGraphQL
         $listing = $listings->shuffle()->first();
         $response = $this->graphql(
             $this->method,
-            ['makeAssetId' => ['collectionId' => $listing->make_collection_chain_id, 'tokenId' => $listing->make_token_chain_id]]
+            ['makeAssetId' => ['collectionId' => $listing->make_collection_chain_id, 'tokenId' => ['integer' => $listing->make_token_chain_id]]]
         );
         $this->assertNotEmpty($response['totalCount']);
 
         $listing = $listings->shuffle()->first();
         $response = $this->graphql(
             $this->method,
-            ['takeAssetId' => ['collectionId' => $listing->take_collection_chain_id, 'tokenId' => $listing->take_token_chain_id]]
+            ['takeAssetId' => ['collectionId' => $listing->take_collection_chain_id, 'tokenId' => ['integer' => $listing->take_token_chain_id]]]
         );
         $this->assertNotEmpty($response['totalCount']);
     }
@@ -149,7 +149,7 @@ class GetListingsTest extends TestCaseGraphQL
             $response['errors'][0]['message']
         );
         $this->assertStringContainsString(
-            'Variable "$makeAssetId" got invalid value 1.1579208923732E+77 at "makeAssetId.tokenId"; Cannot represent following value as uint256: 1.1579208923732E+77',
+            'Variable "$makeAssetId" got invalid value 1.1579208923732E+77 at "makeAssetId.tokenId"; Expected type "EncodableTokenIdInput" to be an object.',
             $response['errors'][1]['message']
         );
 
@@ -168,7 +168,7 @@ class GetListingsTest extends TestCaseGraphQL
             $response['errors'][0]['message']
         );
         $this->assertStringContainsString(
-            'Variable "$takeAssetId" got invalid value 1.1579208923732E+77 at "takeAssetId.tokenId"; Cannot represent following value as uint256: 1.1579208923732E+77',
+            'Variable "$takeAssetId" got invalid value 1.1579208923732E+77 at "takeAssetId.tokenId"; Expected type "EncodableTokenIdInput" to be an object',
             $response['errors'][1]['message']
         );
     }

@@ -20,7 +20,6 @@ use Enjin\Platform\Marketplace\Rules\TokenExistsInCollection;
 use Enjin\Platform\Models\Transaction;
 use Enjin\Platform\Rules\MaxBigInt;
 use Enjin\Platform\Rules\MinBigInt;
-use Enjin\Platform\Rules\ValidSubstrateAddress;
 use Enjin\Platform\Support\Hex;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
@@ -64,17 +63,13 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
     public function args(): array
     {
         return [
-            'account' => [
-                'type' => GraphQL::type('String!'),
-                'description' => __('enjin-platform-marketplace::mutation.create_listing.args.account'),
-            ],
             'makeAssetId' => [
                 'type' => GraphQL::type('MultiTokenIdInput!'),
-                'description' => __('enjin-platform-marketplace::create_listing.args.makeAsset'),
+                'description' => __('enjin-platform-marketplace::mutation.create_listing.args.makeAssetId'),
             ],
             'takeAssetId' => [
                 'type' => GraphQL::type('MultiTokenIdInput!'),
-                'description' => __('enjin-platform-marketplace::create_listing.args.takeAsset'),
+                'description' => __('enjin-platform-marketplace::mutation.create_listing.args.takeAssetId'),
             ],
             'amount' => [
                 'type' => GraphQL::type('BigInt!'),
@@ -174,12 +169,6 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         $takeRule = $this->makeOrTakeRule($takeCollection = Arr::get($args, 'takeAssetId.collectionId'), false);
 
         return [
-            'account' => [
-                'bail',
-                'filled',
-                'max:255',
-                new ValidSubstrateAddress(),
-            ],
             'makeAssetId' => new TokenExistsInCollection($makeCollection),
             ...$makeRule,
             ...$this->getTokenFieldRules('makeAssetId'),

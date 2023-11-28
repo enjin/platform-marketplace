@@ -2,8 +2,8 @@ query GetListings(
   $ids: [BigInt!]
   $listingIds: [String!]
   $account: String
-  $makeAssetId: AssetInputType
-  $takeAssetId: AssetInputType
+  $makeAssetId: MultiTokenIdInput
+  $takeAssetId: MultiTokenIdInput
 ) {
   GetListings(
     ids: $ids
