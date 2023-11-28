@@ -4,7 +4,6 @@ namespace Enjin\Platform\Marketplace\GraphQL\Mutations;
 
 use Enjin\Platform\Interfaces\PlatformGraphQlMutation;
 use Enjin\Platform\Marketplace\GraphQL\Traits\InMarketplaceSchema;
-use Illuminate\Support\Str;
 use Rebing\GraphQL\Support\Mutation as GraphQlMutation;
 
 abstract class Mutation extends GraphQlMutation implements PlatformGraphQlMutation
@@ -23,7 +22,7 @@ abstract class Mutation extends GraphQlMutation implements PlatformGraphQlMutati
      */
     public function getMethodName(): string
     {
-        return Str::camel($this->attributes()['name']);
+        return $this->attributes()['name'];
     }
 
     /**
