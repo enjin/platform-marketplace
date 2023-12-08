@@ -45,6 +45,7 @@ class AuctionFinalized implements SubstrateEvent
 
         $sale = MarketplaceSale::create([
             'marketplace_listing_id' => $listing->id,
+            'listing_id' => $listing->listing_id,
             'wallet_id' => $bidder->id,
             'price' => $event->price,
             'amount' => $listing->amount,

@@ -70,7 +70,7 @@ class MarketplaceListing extends BaseModel
      */
     public function sales(): HasMany
     {
-        return $this->hasMany(MarketplaceSale::class);
+        return $this->hasMany(MarketplaceSale::class, 'listing_id', 'listing_id');
     }
 
     /**

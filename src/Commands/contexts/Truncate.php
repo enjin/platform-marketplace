@@ -12,7 +12,6 @@ class Truncate
         return [
             'marketplace_listings',
             'marketplace_bids',
-            'marketplace_sales',
             'marketplace_states',
         ];
     }
