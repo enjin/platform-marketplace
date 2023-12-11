@@ -12,7 +12,7 @@ class ListingCreated extends PlatformBroadcastEvent
     /**
      * Create a new event instance.
      */
-    public function __construct(Model $listing)
+    public function __construct(Model $listing, Model $state)
     {
         parent::__construct();
 
@@ -31,6 +31,7 @@ class ListingCreated extends PlatformBroadcastEvent
             'price' => $listing->price,
             'minTakeValue' => $listing->min_take_value,
             'fee_side' => $listing->fee_side,
+            'state' => $state->state,
             'creation_block' => $listing->creation_block,
             'deposit' => $listing->deposit,
             'salt' => $listing->salt,
