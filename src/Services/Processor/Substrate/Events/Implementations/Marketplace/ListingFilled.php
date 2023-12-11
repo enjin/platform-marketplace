@@ -35,7 +35,7 @@ class ListingFilled implements SubstrateEvent
 
         $sale = MarketplaceSale::create([
             'marketplace_listing_id' => $listing->id,
-            'listing_id' => $listing->listing_id,
+            'listing_chain_id' => $listing->listing_chain_id,
             'wallet_id' => $buyer->id,
             'price' => $listing->price,
             'amount' => $event->amountFilled,

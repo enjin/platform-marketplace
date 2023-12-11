@@ -28,7 +28,7 @@ class MarketplaceListing extends BaseModel
      * @var array
      */
     protected $fillable = [
-        'listing_id',
+        'listing_chain_id',
         'seller_wallet_id',
         'make_collection_chain_id',
         'make_token_chain_id',
@@ -70,7 +70,7 @@ class MarketplaceListing extends BaseModel
      */
     public function sales(): HasMany
     {
-        return $this->hasMany(MarketplaceSale::class, 'listing_id', 'listing_id');
+        return $this->hasMany(MarketplaceSale::class, 'listing_chain_id', 'listing_chain_id');
     }
 
     /**

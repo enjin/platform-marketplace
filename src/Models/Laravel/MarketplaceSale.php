@@ -28,7 +28,7 @@ class MarketplaceSale extends BaseModel
      */
     protected $fillable = [
         'marketplace_listing_id',
-        'listing_id',
+        'listing_chain_id',
         'wallet_id',
         'price',
         'amount',

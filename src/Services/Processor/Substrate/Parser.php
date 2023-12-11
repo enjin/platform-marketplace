@@ -61,7 +61,7 @@ class Parser extends BaseParser
             ];
 
             $insertData[] = [
-                'listing_id' => Arr::get($listingKey, 'listingId'),
+                'listing_chain_id' => Arr::get($listingKey, 'listingId'),
                 'seller_wallet_id' => $sellerWallet->id,
                 'make_collection_chain_id' => Arr::get($listingData, 'makeAssetId')->collectionId, // Shouldn't we use the primary keys?
                 'make_token_chain_id' => Arr::get($listingData, 'makeAssetId')->tokenId, // Shouldn't we use the primary keys?

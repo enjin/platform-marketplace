@@ -36,7 +36,7 @@ class ListingCreated implements SubstrateEvent
         $seller = WalletService::firstOrStore(['account' => Account::parseAccount($event->seller)]);
 
         $listing = MarketplaceListing::create([
-            'listing_id' => $listingId,
+            'listing_chain_id' => $listingId,
             'seller_wallet_id' => $seller->id,
             'make_collection_chain_id' => Arr::get($event->makeAssetId, 'collection_id'),
             'make_token_chain_id' => Arr::get($event->makeAssetId, 'token_id'),

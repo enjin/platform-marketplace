@@ -39,7 +39,7 @@ class MinimumPrice implements DataAwareRule, ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if ($listingId = Arr::get($this->data, 'listingId')) {
-            if (!$listing = MarketplaceListing::where('listing_id', $listingId)->with('highestBid')->first()) {
+            if (!$listing = MarketplaceListing::where('listing_chain_id', $listingId)->with('highestBid')->first()) {
                 return;
             }
 

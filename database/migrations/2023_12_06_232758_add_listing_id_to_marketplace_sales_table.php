@@ -11,7 +11,11 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::table('marketplace_sales', function (Blueprint $table) {
-            $table->string('listing_id')->index()->after('id');
+            $table->string('listing_chain_id')->index()->after('id');
+        });
+
+        Schema::table('marketplace_listings', function (Blueprint $table) {
+            $table->renameColumn('listing_id', 'listing_chain_id');
         });
     }
 
@@ -22,6 +26,10 @@ return new class () extends Migration {
     {
         Schema::table('marketplace_sales', function (Blueprint $table) {
             $table->dropColumn('listing_id');
+        });
+
+        Schema::table('marketplace_listings', function (Blueprint $table) {
+            $table->renameColumn('listing_chain_id', 'listing_id');
         });
     }
 };

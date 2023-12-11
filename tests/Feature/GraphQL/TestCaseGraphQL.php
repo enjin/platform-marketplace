@@ -128,7 +128,7 @@ class TestCaseGraphQL extends BaseTestCase
                 ->create([
                     'wallet_id' => $this->wallet->id,
                     'marketplace_listing_id' => $listing->id,
-                    'listing_id' => $listing->listing_id,
+                    'listing_chain_id' => $listing->listing_chain_id,
                 ])
         );
 
