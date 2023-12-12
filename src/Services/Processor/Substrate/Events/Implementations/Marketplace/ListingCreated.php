@@ -5,9 +5,11 @@ namespace Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Impleme
 use Carbon\Carbon;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\Platform\Marketplace\Enums\FeeSide;
+use Enjin\Platform\Marketplace\Enums\ListingState;
 use Enjin\Platform\Marketplace\Enums\ListingType;
 use Enjin\Platform\Marketplace\Events\Substrate\Marketplace\ListingCreated as ListingCreatedEvent;
 use Enjin\Platform\Marketplace\Models\MarketplaceListing;
+use Enjin\Platform\Marketplace\Models\MarketplaceState;
 use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\Traits\QueryDataOrFail;
 use Enjin\Platform\Models\Laravel\Block;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Codec;
@@ -57,6 +59,14 @@ class ListingCreated implements SubstrateEvent
             'updated_at' => $now,
         ]);
 
+        $state = MarketplaceState::create([
+            'marketplace_listing_id' => $listing->id,
+            'state' => ListingState::ACTIVE->name,
+            'height' => $event->creationBlock,
+            'created_at' => $now = Carbon::now(),
+            'updated_at' => $now,
+        ]);
+
         Log::info(
             sprintf(
                 'Listing %s (id: %s) was created.',
@@ -65,6 +75,6 @@ class ListingCreated implements SubstrateEvent
             )
         );
 
-        ListingCreatedEvent::safeBroadcast($listing);
+        ListingCreatedEvent::safeBroadcast($listing, $state);
     }
 }
