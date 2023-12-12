@@ -60,7 +60,7 @@ class ListingCreated implements SubstrateEvent
         ]);
 
         $state = MarketplaceState::create([
-            'marketplace_listing_id' => $listingId,
+            'marketplace_listing_id' => $listing->id,
             'state' => ListingState::ACTIVE->name,
             'height' => $event->creationBlock,
             'created_at' => $now = Carbon::now(),
