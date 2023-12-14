@@ -91,7 +91,7 @@ class GetListingsQuery extends Query
                 fn ($query) => $query->whereIn('id', $ids)
             )->when(
                 $listingIds = Arr::get($args, 'listingIds'),
-                fn ($query) => $query->whereIn('listing_id', $listingIds)
+                fn ($query) => $query->whereIn('listing_chain_id', $listingIds)
             )->when(
                 $account = Arr::get($args, 'account'),
                 fn ($query) => $query->whereHas(

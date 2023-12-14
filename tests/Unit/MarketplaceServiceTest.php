@@ -23,7 +23,7 @@ class MarketplaceServiceTest extends TestCase
         $service = resolve(MarketplaceService::class);
         $listing = MarketplaceListing::factory()->make(['seller_wallet_id' => $this->wallet->id]);
         $this->assertNotEmpty($model = $service->store($listing->toArray()));
-        $this->assertNotEmpty($service->get($model->listing_id));
+        $this->assertNotEmpty($service->get($model->listing_chain_id));
         $this->assertTrue($service->insert(
             MarketplaceListing::factory()->make(['seller_wallet_id' => $this->wallet->id])->toArray()
         ));

@@ -16,7 +16,7 @@ class ListingNotCancelled implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!$listing = MarketplaceListing::where('listing_id', $value)->with('state')->first()) {
+        if (!$listing = MarketplaceListing::where('listing_chain_id', $value)->with('state')->first()) {
             $fail('validation.exists')->translate();
 
             return;

@@ -82,6 +82,7 @@ trait EagerLoadSelectFields
         $fields = Arr::get($selections, $attribute, $selections);
         $select = array_filter([
             'id',
+            'listing_chain_id',
             isset($fields['seller']) ? 'seller_wallet_id' : null,
             isset($fields['state']) || isset($fields['data']) ? 'type' : null,
             ...(isset($fields['state']) ? ['amount_filled', 'type'] : []),
@@ -196,6 +197,7 @@ trait EagerLoadSelectFields
         $select = array_filter([
             'id',
             'marketplace_listing_id',
+            'listing_chain_id',
             isset($fields['bidder']) ? 'wallet_id' : null,
             ...MarketplaceSaleType::getSelectFields($fieldKeys = array_keys($fields)),
         ]);
