@@ -17,7 +17,7 @@ class ListingFilled extends PlatformBroadcastEvent
         parent::__construct();
 
         $this->broadcastData = [
-            'listingId' => $listing->listing_id,
+            'listingId' => $listing->listing_chain_id,
             'seller' => $listing->seller->address,
             'makeAssetId' => [
                 'collectionId' => $listing->make_collection_chain_id,

@@ -88,7 +88,7 @@ class GetSalesQuery extends Query
                 $listingIds = Arr::get($args, 'listingIds'),
                 fn ($query) => $query->whereHas(
                     'listing',
-                    fn ($query) => $query->whereIn('listing_id', $listingIds)
+                    fn ($query) => $query->whereIn('listing_chain_id', $listingIds)
                 )
             )->cursorPaginateWithTotalDesc('marketplace_sales.id', $args['first']);
     }

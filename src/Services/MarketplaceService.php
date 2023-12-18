@@ -10,7 +10,7 @@ class MarketplaceService
     /**
      * Get the collection by column and value.
      */
-    public function get(string $index, string $column = 'listing_id'): Model
+    public function get(string $index, string $column = 'listing_chain_id'): Model
     {
         return MarketplaceListing::where($column, '=', $index)->firstOrFail();
     }

@@ -166,7 +166,7 @@ DROP TABLE IF EXISTS `marketplace_listings`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `marketplace_listings` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `listing_id` varchar(255) NOT NULL,
+  `listing_chain_id` varchar(255) NOT NULL,
   `seller_wallet_id` bigint unsigned NOT NULL,
   `make_collection_chain_id` varchar(255) NOT NULL,
   `make_token_chain_id` varchar(255) NOT NULL,
@@ -186,7 +186,7 @@ CREATE TABLE `marketplace_listings` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `marketplace_listings_listing_id_unique` (`listing_id`),
+  UNIQUE KEY `marketplace_listings_listing_id_unique` (`listing_chain_id`),
   KEY `marketplace_listings_seller_wallet_id_index` (`seller_wallet_id`),
   KEY `marketplace_listings_make_collection_chain_id_index` (`make_collection_chain_id`),
   KEY `marketplace_listings_make_token_chain_id_index` (`make_token_chain_id`),
@@ -200,6 +200,7 @@ DROP TABLE IF EXISTS `marketplace_sales`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `marketplace_sales` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `listing_chain_id` varchar(255) NOT NULL,
   `marketplace_listing_id` bigint unsigned NOT NULL,
   `amount` varchar(255) NOT NULL,
   `price` varchar(255) NOT NULL,
@@ -209,6 +210,7 @@ CREATE TABLE `marketplace_sales` (
   PRIMARY KEY (`id`),
   KEY `marketplace_sales_marketplace_listing_id_index` (`marketplace_listing_id`),
   KEY `marketplace_sales_wallet_id_index` (`wallet_id`),
+  KEY `marketplace_sales_listing_chain_id_index` (`listing_chain_id`),
   CONSTRAINT `marketplace_sales_marketplace_listing_id_foreign` FOREIGN KEY (`marketplace_listing_id`) REFERENCES `marketplace_listings` (`id`),
   CONSTRAINT `marketplace_sales_wallet_id_foreign` FOREIGN KEY (`wallet_id`) REFERENCES `wallets` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -328,7 +330,6 @@ CREATE TABLE `tokens` (
   `is_frozen` tinyint(1) NOT NULL DEFAULT '0',
   `minimum_balance` varchar(255) NOT NULL DEFAULT '1',
   `unit_price` varchar(255) NOT NULL DEFAULT '0',
-  `mint_deposit` varchar(255) NOT NULL DEFAULT '0',
   `attribute_count` int NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -349,11 +350,13 @@ CREATE TABLE `transactions` (
   `idempotency_key` varchar(255) DEFAULT NULL,
   `transaction_chain_id` varchar(255) DEFAULT NULL,
   `transaction_chain_hash` varchar(255) DEFAULT NULL,
-  `wallet_public_key` char(70) NOT NULL,
+  `wallet_public_key` char(70) DEFAULT NULL,
   `method` varchar(255) NOT NULL,
   `state` char(15) NOT NULL DEFAULT 'PENDING',
   `result` varchar(255) DEFAULT NULL,
   `encoded_data` text,
+  `fee` varchar(255) DEFAULT NULL,
+  `deposit` varchar(255) DEFAULT NULL,
   `signed_at_block` int unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -408,24 +411,28 @@ CREATE TABLE `wallets` (
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
-INSERT INTO `migrations` VALUES (1,'2022_04_09_120404_create_wallets_table',1);
-INSERT INTO `migrations` VALUES (2,'2022_04_09_120405_create_collections_table',1);
-INSERT INTO `migrations` VALUES (3,'2022_04_09_120406_create_collection_accounts_table',1);
-INSERT INTO `migrations` VALUES (4,'2022_04_09_120407_create_tokens_table',1);
-INSERT INTO `migrations` VALUES (5,'2022_04_09_120408_create_token_accounts_table',1);
-INSERT INTO `migrations` VALUES (6,'2022_04_09_120409_create_attributes_table',1);
-INSERT INTO `migrations` VALUES (7,'2022_04_09_120410_create_blocks_table',1);
-INSERT INTO `migrations` VALUES (8,'2022_04_09_120411_create_transactions_table',1);
-INSERT INTO `migrations` VALUES (9,'2022_05_26_101200_create_verifications_table',1);
-INSERT INTO `migrations` VALUES (10,'2022_06_19_103015_create_token_account_approvals_table',1);
-INSERT INTO `migrations` VALUES (11,'2022_06_19_144041_create_token_account_named_reserves_table',1);
-INSERT INTO `migrations` VALUES (12,'2022_06_19_152115_create_collection_account_approvals_table',1);
-INSERT INTO `migrations` VALUES (13,'2022_09_14_144041_create_collection_royalty_currencies_table',1);
-INSERT INTO `migrations` VALUES (14,'2022_10_22_131819_create_events_table',1);
-INSERT INTO `migrations` VALUES (15,'2023_02_03_135022_create_pending_events_table',1);
-INSERT INTO `migrations` VALUES (16,'2023_03_20_204012_add_signed_at_block',1);
-INSERT INTO `migrations` VALUES (17,'2023_03_22_075800_create_marketplace_listings_table',1);
-INSERT INTO `migrations` VALUES (18,'2023_03_22_085800_create_marketplace_bids_table',1);
-INSERT INTO `migrations` VALUES (19,'2023_03_22_095800_create_marketplace_sales_table',1);
-INSERT INTO `migrations` VALUES (20,'2023_03_22_099800_create_marketplace_states_table',1);
-INSERT INTO `migrations` VALUES (21,'2023_05_23_034339_remove_link_code_from_wallets_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (1,'2022_04_09_120404_create_wallets_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (2,'2022_04_09_120405_create_collections_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (3,'2022_04_09_120406_create_collection_accounts_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (4,'2022_04_09_120407_create_tokens_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (5,'2022_04_09_120408_create_token_accounts_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (6,'2022_04_09_120409_create_attributes_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (7,'2022_04_09_120410_create_blocks_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (8,'2022_04_09_120411_create_transactions_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (9,'2022_05_26_101200_create_verifications_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (10,'2022_06_19_103015_create_token_account_approvals_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (11,'2022_06_19_144041_create_token_account_named_reserves_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (12,'2022_06_19_152115_create_collection_account_approvals_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (13,'2022_09_14_144041_create_collection_royalty_currencies_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (14,'2022_10_22_131819_create_events_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (15,'2023_02_03_135022_create_pending_events_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (16,'2023_03_20_204012_add_signed_at_block',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (17,'2023_03_22_075800_create_marketplace_listings_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (18,'2023_03_22_085800_create_marketplace_bids_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (19,'2023_03_22_095800_create_marketplace_sales_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (20,'2023_03_22_099800_create_marketplace_states_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (21,'2023_05_23_034339_remove_link_code_from_wallets_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (22,'2023_08_01_175612_remove_mint_deposit_from_tokens_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (23,'2023_08_16_184438_add_fee_to_transactions_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (24,'2023_11_06_133605_make_account_nullable_in_transactions',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (25,'2023_12_06_232758_add_listing_id_to_marketplace_sales_table',1);

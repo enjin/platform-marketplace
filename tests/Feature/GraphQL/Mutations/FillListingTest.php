@@ -22,7 +22,7 @@ class FillListingTest extends TestCaseGraphQL
         $listing = $this->createListing();
         $response = $this->graphql(
             $this->method,
-            $params = ['listingId' => $listing->listing_id, 'amount' => fake()->numberBetween(1, 1000)]
+            $params = ['listingId' => $listing->listing_chain_id, 'amount' => fake()->numberBetween(1, 1000)]
         );
 
         $this->assertEquals(
@@ -34,7 +34,7 @@ class FillListingTest extends TestCaseGraphQL
     public function test_it_will_fail_with_invalid_parameter_listing_id(): void
     {
         $listing = $this->createListing();
-        $data = ['listingId' => $listing->listing_id, 'amount' => fake()->numberBetween(1, 1000)];
+        $data = ['listingId' => $listing->listing_chain_id, 'amount' => fake()->numberBetween(1, 1000)];
         $response = $this->graphql(
             $this->method,
             array_merge($data, ['listingId' => null]),
@@ -93,7 +93,7 @@ class FillListingTest extends TestCaseGraphQL
     public function test_it_will_fail_with_invalid_parameter_amount(): void
     {
         $listing = $this->createListing();
-        $data = ['listingId' => $listing->listing_id, 'amount' => fake()->numberBetween(1, 1000)];
+        $data = ['listingId' => $listing->listing_chain_id, 'amount' => fake()->numberBetween(1, 1000)];
         $response = $this->graphql(
             $this->method,
             array_merge($data, ['amount' => null]),

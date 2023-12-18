@@ -24,7 +24,7 @@ class GetListingTest extends TestCaseGraphQL
 
         $response = $this->graphql(
             $this->method,
-            ['listingId' => $listing->listing_id],
+            ['listingId' => $listing->listing_chain_id],
         );
         $this->assertNotEmpty($response);
     }

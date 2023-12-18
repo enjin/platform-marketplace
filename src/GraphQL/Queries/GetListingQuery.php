@@ -66,7 +66,7 @@ class GetListingQuery extends Query
                 fn ($query) => $query->where('id', $id)
             )->when(
                 $listingId = Arr::get($args, 'listingId'),
-                fn ($query) => $query->where('listing_id', $listingId)
+                fn ($query) => $query->where('listing_chain_id', $listingId)
             )->first();
     }
 
@@ -87,7 +87,7 @@ class GetListingQuery extends Query
                 'bail',
                 'required_without:id',
                 'max:255',
-                Rule::exists('marketplace_listings', 'listing_id'),
+                Rule::exists('marketplace_listings', 'listing_chain_id'),
             ],
         ];
     }

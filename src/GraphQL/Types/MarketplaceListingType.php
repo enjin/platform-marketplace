@@ -37,7 +37,7 @@ class MarketplaceListingType extends Type
             'listingId' => [
                 'type' => GraphQL::type('String!'),
                 'description' => __('enjin-platform-marketplace::type.marketplace_listing.field.listingId'),
-                'alias' => 'listing_id',
+                'alias' => 'listing_chain_id',
             ],
             'makeAssetId' => [
                 'type' => GraphQL::type('Asset!'),

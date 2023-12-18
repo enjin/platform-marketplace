@@ -31,7 +31,7 @@ class GetListingsTest extends TestCaseGraphQL
 
         $response = $this->graphql(
             $this->method,
-            ['listingIds' => $listings->pluck('listing_id')->toArray()],
+            ['listingIds' => $listings->pluck('listing_chain_id')->toArray()],
         );
         $this->assertNotEmpty($response['totalCount']);
 

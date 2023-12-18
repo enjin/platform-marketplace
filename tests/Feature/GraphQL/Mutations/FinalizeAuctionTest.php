@@ -21,7 +21,7 @@ class FinalizeAuctionTest extends TestCaseGraphQL
         $listing = $this->createListing();
         $response = $this->graphql(
             $this->method,
-            $params = ['listingId' => $listing->listing_id]
+            $params = ['listingId' => $listing->listing_chain_id]
         );
         $this->assertEquals(
             $response['encodedData'],
@@ -78,7 +78,7 @@ class FinalizeAuctionTest extends TestCaseGraphQL
         ]);
         $response = $this->graphql(
             $this->method,
-            ['listingId' => $listing->listing_id],
+            ['listingId' => $listing->listing_chain_id],
             true
         );
         $this->assertArraySubset(
