@@ -64,6 +64,5 @@ class BidPlaced implements SubstrateEvent
                 )
             );
         }
-
     }
 }

@@ -44,7 +44,7 @@ class Parser extends BaseParser
             $shouldParse = collect(config('enjin-platform.indexing.filters.collections'))
                 ->contains([
                     Arr::get($listingData, 'makeAssetId')->collectionId,
-                    Arr::get($listingData, 'takeAssetId')->collectionId
+                    Arr::get($listingData, 'takeAssetId')->collectionId,
                 ]);
 
             if (!$shouldParse) {

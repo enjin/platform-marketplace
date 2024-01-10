@@ -66,6 +66,5 @@ class ListingFilled implements SubstrateEvent
                 )
             );
         }
-
     }
 }

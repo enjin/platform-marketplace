@@ -2,7 +2,6 @@
 
 namespace Enjin\Platform\Marketplace\Enums\Substrate;
 
-use Enjin\Platform\Marketplace\Enums\Substrate\StorageType;
 use Enjin\Platform\Exceptions\PlatformException;
 
 class StorageKey
@@ -15,7 +14,6 @@ class StorageKey
     {
         return new self(StorageType::LISTINGS, $value ?? '0xb8f32c9f36429933d924999a1b87423f202053cada0eb576e7ccf72ebc965b05');
     }
-
 
     /**
      * Get the parser for this storage key.
