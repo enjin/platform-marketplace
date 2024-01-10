@@ -32,37 +32,47 @@ class AuctionFinalized implements SubstrateEvent
         }
 
         $listingId = HexConverter::prefix($event->listingId);
-        $listing = $this->getListing($listingId);
-        $bidder = WalletService::firstOrStore(['account' => Account::parseAccount($event->winningBidder)]);
 
-        $state = MarketplaceState::create([
-            'marketplace_listing_id' => $listing->id,
-            'state' => ListingState::FINALIZED->name,
-            'height' => $block->number,
-            'created_at' => $now = Carbon::now(),
-            'updated_at' => $now,
-        ]);
+        try {
+            $listing = $this->getListing($listingId);
+            $bidder = WalletService::firstOrStore(['account' => Account::parseAccount($event->winningBidder)]);
 
-        $sale = MarketplaceSale::create([
-            'marketplace_listing_id' => $listing->id,
-            'listing_chain_id' => $listing->listing_chain_id,
-            'wallet_id' => $bidder->id,
-            'price' => $event->price,
-            'amount' => $listing->amount,
-        ]);
+            $state = MarketplaceState::create([
+                'marketplace_listing_id' => $listing->id,
+                'state' => ListingState::FINALIZED->name,
+                'height' => $block->number,
+                'created_at' => $now = Carbon::now(),
+                'updated_at' => $now,
+            ]);
 
-        Log::info(
-            sprintf(
-                'Listing %s (id: %s) was finalized (id: %s) with a sale (id: %s) from %s (id: %s).',
-                $listingId,
-                $listing->id,
-                $state->id,
-                $sale->id,
-                $event->winningBidder,
-                $bidder->id,
-            )
-        );
+            $sale = MarketplaceSale::create([
+                'marketplace_listing_id' => $listing->id,
+                'listing_chain_id' => $listing->listing_chain_id,
+                'wallet_id' => $bidder->id,
+                'price' => $event->price,
+                'amount' => $listing->amount,
+            ]);
 
-        AuctionFinalizedEvent::safeBroadcast($listing, $state, $sale);
+            Log::info(
+                sprintf(
+                    'Listing %s (id: %s) was finalized (id: %s) with a sale (id: %s) from %s (id: %s).',
+                    $listingId,
+                    $listing->id,
+                    $state->id,
+                    $sale->id,
+                    $event->winningBidder,
+                    $bidder->id,
+                )
+            );
+
+            AuctionFinalizedEvent::safeBroadcast($listing, $state, $sale);
+        } catch (\Throwable $e) {
+            Log::error(
+                sprintf(
+                    'Listing %s was finalized but could not be found in the database.',
+                    $listingId,
+                )
+            );
+        }
     }
 }

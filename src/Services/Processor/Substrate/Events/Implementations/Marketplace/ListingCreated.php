@@ -34,6 +34,10 @@ class ListingCreated implements SubstrateEvent
             return;
         }
 
+        if (!$this->shouldIndexCollection(Arr::get($event->makeAssetId, 'collection_id')) && !$this->shouldIndexCollection(Arr::get($event->takeAssetId, 'collection_id'))) {
+            return;
+        }
+
         $listingId = HexConverter::prefix($event->listingId);
         $seller = WalletService::firstOrStore(['account' => Account::parseAccount($event->seller)]);
 
