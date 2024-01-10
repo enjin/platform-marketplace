@@ -29,25 +29,35 @@ class ListingCancelled implements SubstrateEvent
         }
 
         $listingId = HexConverter::prefix($event->listingId);
-        $listing = $this->getListing($listingId);
 
-        $state = MarketplaceState::create([
-            'marketplace_listing_id' => $listing->id,
-            'state' => ListingState::CANCELLED->name,
-            'height' => $block->number,
-            'created_at' => $now = Carbon::now(),
-            'updated_at' => $now,
-        ]);
+        try {
+            $listing = $this->getListing($listingId);
 
-        Log::info(
-            sprintf(
-                'Listing %s (id: %s) was cancelled (id: %s).',
-                $listingId,
-                $listing->id,
-                $state->id,
-            )
-        );
+            $state = MarketplaceState::create([
+                'marketplace_listing_id' => $listing->id,
+                'state' => ListingState::CANCELLED->name,
+                'height' => $block->number,
+                'created_at' => $now = Carbon::now(),
+                'updated_at' => $now,
+            ]);
 
-        ListingCancelledEvent::safeBroadcast($listing, $state);
+            Log::info(
+                sprintf(
+                    'Listing %s (id: %s) was cancelled (id: %s).',
+                    $listingId,
+                    $listing->id,
+                    $state->id,
+                )
+            );
+
+            ListingCancelledEvent::safeBroadcast($listing, $state);
+        } catch (\Throwable $e) {
+            Log::error(
+                sprintf(
+                    'Listing %s was cancelled but could not be found in the database.',
+                    $listingId,
+                )
+            );
+        }
     }
 }

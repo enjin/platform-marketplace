@@ -41,6 +41,16 @@ class Parser extends BaseParser
             $listingKey = $this->codec->decoder()->listingStorageKey($key);
             $listingData = $this->codec->decoder()->listingStorageData($listing);
 
+            $shouldParse = collect(config('enjin-platform.indexing.filters.collections'))
+                ->contains([
+                    Arr::get($listingData, 'makeAssetId')->collectionId,
+                    Arr::get($listingData, 'takeAssetId')->collectionId,
+                ]);
+
+            if (!$shouldParse) {
+                continue;
+            }
+
             $sellerWallet = $this->getCachedWallet(
                 $user = $listingData['seller'],
                 fn () => $this->walletService->firstOrStore(['account' => $user])

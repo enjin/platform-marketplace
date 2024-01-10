@@ -30,29 +30,39 @@ class BidPlaced implements SubstrateEvent
         }
 
         $listingId = HexConverter::prefix($event->listingId);
-        $listing = $this->getListing($listingId);
-        $bidder = WalletService::firstOrStore(['account' => Account::parseAccount($event->bidder)]);
 
-        $bid = MarketplaceBid::create([
-            'marketplace_listing_id' => $listing->id,
-            'wallet_id' => $bidder->id,
-            'price' => $event->price,
-            'height' => $block->number,
-            'created_at' => $now = Carbon::now(),
-            'updated_at' => $now,
-        ]);
+        try {
+            $listing = $this->getListing($listingId);
+            $bidder = WalletService::firstOrStore(['account' => Account::parseAccount($event->bidder)]);
 
-        Log::info(
-            sprintf(
-                '%s (id: %s) placed a bid (id: %s) on listing %s (id: %s).',
-                $event->bidder,
-                $bidder->id,
-                $bid->id,
-                $listingId,
-                $listing->id,
-            )
-        );
+            $bid = MarketplaceBid::create([
+                'marketplace_listing_id' => $listing->id,
+                'wallet_id' => $bidder->id,
+                'price' => $event->price,
+                'height' => $block->number,
+                'created_at' => $now = Carbon::now(),
+                'updated_at' => $now,
+            ]);
 
-        BidPlacedEvent::safeBroadcast($listing, $bid);
+            Log::info(
+                sprintf(
+                    '%s (id: %s) placed a bid (id: %s) on listing %s (id: %s).',
+                    $event->bidder,
+                    $bidder->id,
+                    $bid->id,
+                    $listingId,
+                    $listing->id,
+                )
+            );
+
+            BidPlacedEvent::safeBroadcast($listing, $bid);
+        } catch (\Throwable $e) {
+            Log::error(
+                sprintf(
+                    'Listing %s was filled but could not be found in the database.',
+                    $listingId,
+                )
+            );
+        }
     }
 }

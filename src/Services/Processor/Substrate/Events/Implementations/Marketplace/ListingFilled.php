@@ -30,31 +30,41 @@ class ListingFilled implements SubstrateEvent
         }
 
         $listingId = HexConverter::prefix($event->listingId);
-        $listing = $this->getListing($listingId);
-        $buyer = WalletService::firstOrStore(['account' => Account::parseAccount($event->buyer)]);
 
-        $sale = MarketplaceSale::create([
-            'marketplace_listing_id' => $listing->id,
-            'listing_chain_id' => $listing->listing_chain_id,
-            'wallet_id' => $buyer->id,
-            'price' => $listing->price,
-            'amount' => $event->amountFilled,
-            'created_at' => $now = Carbon::now(),
-            'updated_at' => $now,
-        ]);
+        try {
+            $listing = $this->getListing($listingId);
+            $buyer = WalletService::firstOrStore(['account' => Account::parseAccount($event->buyer)]);
 
-        Log::info(
-            sprintf(
-                'Listing %s (id: %s) was filled with %s amount from sale (id: %s) from %s (id: %s).',
-                $listingId,
-                $listing->id,
-                $event->amountFilled,
-                $sale->id,
-                $event->buyer,
-                $buyer->id,
-            )
-        );
+            $sale = MarketplaceSale::create([
+                'marketplace_listing_id' => $listing->id,
+                'listing_chain_id' => $listing->listing_chain_id,
+                'wallet_id' => $buyer->id,
+                'price' => $listing->price,
+                'amount' => $event->amountFilled,
+                'created_at' => $now = Carbon::now(),
+                'updated_at' => $now,
+            ]);
 
-        ListingFilledEvent::safeBroadcast($listing, $sale);
+            Log::info(
+                sprintf(
+                    'Listing %s (id: %s) was filled with %s amount from sale (id: %s) from %s (id: %s).',
+                    $listingId,
+                    $listing->id,
+                    $event->amountFilled,
+                    $sale->id,
+                    $event->buyer,
+                    $buyer->id,
+                )
+            );
+
+            ListingFilledEvent::safeBroadcast($listing, $sale);
+        } catch (\Throwable $e) {
+            Log::error(
+                sprintf(
+                    'Listing %s was filled but could not be found in the database.',
+                    $listingId,
+                )
+            );
+        }
     }
 }
