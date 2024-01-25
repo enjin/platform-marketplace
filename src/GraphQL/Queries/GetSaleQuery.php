@@ -4,11 +4,11 @@ namespace Enjin\Platform\Marketplace\GraphQL\Queries;
 
 use Closure;
 use Enjin\Platform\Marketplace\Models\MarketplaceSale;
+use Enjin\Platform\Marketplace\Rules\SaleExists;
 use Enjin\Platform\Rules\MaxBigInt;
 use Enjin\Platform\Rules\MinBigInt;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
-use Illuminate\Validation\Rule;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class GetSaleQuery extends Query
@@ -68,7 +68,7 @@ class GetSaleQuery extends Query
                 'bail',
                 new MinBigInt(),
                 new MaxBigInt(),
-                Rule::exists('marketplace_sales', 'id'),
+                new SaleExists(),
             ],
         ];
     }

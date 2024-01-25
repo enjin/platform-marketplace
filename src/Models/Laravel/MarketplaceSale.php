@@ -4,6 +4,7 @@ namespace Enjin\Platform\Marketplace\Models\Laravel;
 
 use Enjin\Platform\Marketplace\Database\Factories\MarketplaceSaleFactory;
 use Enjin\Platform\Models\BaseModel;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Staudenmeir\EloquentEagerLimit\HasEagerLimit;
@@ -68,5 +69,12 @@ class MarketplaceSale extends BaseModel
     protected static function newFactory()
     {
         return MarketplaceSaleFactory::new();
+    }
+
+    protected function pivotIdentifier(): Attribute
+    {
+        return new Attribute(
+            get: fn () => $this->id
+        );
     }
 }

@@ -4,11 +4,11 @@ namespace Enjin\Platform\Marketplace\GraphQL\Queries;
 
 use Closure;
 use Enjin\Platform\Marketplace\Models\MarketplaceBid;
+use Enjin\Platform\Marketplace\Rules\BidExists;
 use Enjin\Platform\Rules\MaxBigInt;
 use Enjin\Platform\Rules\MinBigInt;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
-use Illuminate\Validation\Rule;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class GetBidQuery extends Query
@@ -68,7 +68,7 @@ class GetBidQuery extends Query
                 'bail',
                 new MinBigInt(),
                 new MaxBigInt(),
-                Rule::exists('marketplace_bids', 'id'),
+                new BidExists(),
             ],
         ];
     }
