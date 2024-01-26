@@ -12,11 +12,14 @@ class AuctionFinalized extends PlatformBroadcastEvent
     /**
      * Create a new event instance.
      */
-    public function __construct(Model $listing, Model $state, Model $sale)
+    public function __construct(Model $listing, Model $state, Model $sale, ?Model $transaction = null)
     {
         parent::__construct();
 
+        $this->model = $sale;
+
         $this->broadcastData = [
+            'idempotencyKey' => $transaction?->idempotency_key,
             'listingId' => $listing->listing_chain_id,
             'seller' => $listing->seller->address,
             'makeAssetId' => [

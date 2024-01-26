@@ -8,6 +8,7 @@ use Enjin\Platform\Marketplace\Events\Substrate\Marketplace\BidPlaced as BidPlac
 use Enjin\Platform\Marketplace\Models\MarketplaceBid;
 use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\Traits\QueryDataOrFail;
 use Enjin\Platform\Models\Laravel\Block;
+use Enjin\Platform\Models\Transaction;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Codec;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\BidPlaced as BidPlacedPolkadart;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\PolkadartEvent;
@@ -55,7 +56,12 @@ class BidPlaced implements SubstrateEvent
                 )
             );
 
-            BidPlacedEvent::safeBroadcast($listing, $bid);
+            $extrinsic = $block->extrinsics[$event->extrinsicIndex];
+            BidPlacedEvent::safeBroadcast(
+                $listing,
+                $bid,
+                Transaction::firstWhere(['transaction_chain_hash' => $extrinsic->hash])
+            );
         } catch (\Throwable $e) {
             Log::error(
                 sprintf(

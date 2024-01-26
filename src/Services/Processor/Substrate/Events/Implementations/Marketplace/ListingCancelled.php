@@ -9,6 +9,7 @@ use Enjin\Platform\Marketplace\Events\Substrate\Marketplace\ListingCancelled as 
 use Enjin\Platform\Marketplace\Models\MarketplaceState;
 use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\Traits\QueryDataOrFail;
 use Enjin\Platform\Models\Laravel\Block;
+use Enjin\Platform\Models\Transaction;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Codec;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\ListingCancelled as ListingCancelledPolkadart;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\PolkadartEvent;
@@ -50,7 +51,12 @@ class ListingCancelled implements SubstrateEvent
                 )
             );
 
-            ListingCancelledEvent::safeBroadcast($listing, $state);
+            $extrinsic = $block->extrinsics[$event->extrinsicIndex];
+            ListingCancelledEvent::safeBroadcast(
+                $listing,
+                $state,
+                Transaction::firstWhere(['transaction_chain_hash' => $extrinsic->hash])
+            );
         } catch (\Throwable $e) {
             Log::error(
                 sprintf(
