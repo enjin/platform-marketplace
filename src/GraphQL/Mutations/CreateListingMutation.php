@@ -17,6 +17,7 @@ use Enjin\Platform\Marketplace\Models\Substrate\MultiTokensTokenAssetIdParams;
 use Enjin\Platform\Marketplace\Rules\EnoughTokenSupply;
 use Enjin\Platform\Marketplace\Rules\FutureBlock;
 use Enjin\Platform\Marketplace\Rules\TokenExistsInCollection;
+use Enjin\Platform\Models\Collection;
 use Enjin\Platform\Models\Transaction;
 use Enjin\Platform\Rules\MaxBigInt;
 use Enjin\Platform\Rules\MinBigInt;
@@ -155,7 +156,11 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 'required_with:' . $makeOrTake . '.tokenId',
                 new MinBigInt(),
                 new MaxBigInt(Hex::MAX_UINT128),
-                Rule::exists('collections', 'collection_chain_id'),
+                function (string $attribute, mixed $value, Closure $fail) {
+                    if (!Collection::where('collection_chain_id', $value)->exists()) {
+                        $fail('validation.exists')->translate();
+                    }
+                },
             ],
         ];
     }
