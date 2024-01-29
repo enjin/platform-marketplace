@@ -10,6 +10,7 @@ use Enjin\Platform\Marketplace\Models\MarketplaceSale;
 use Enjin\Platform\Marketplace\Models\MarketplaceState;
 use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\Traits\QueryDataOrFail;
 use Enjin\Platform\Models\Laravel\Block;
+use Enjin\Platform\Models\Transaction;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Codec;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\AuctionFinalized as AuctionFinalizedPolkadart;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\PolkadartEvent;
@@ -65,7 +66,13 @@ class AuctionFinalized implements SubstrateEvent
                 )
             );
 
-            AuctionFinalizedEvent::safeBroadcast($listing, $state, $sale);
+            $extrinsic = $block->extrinsics[$event->extrinsicIndex];
+            AuctionFinalizedEvent::safeBroadcast(
+                $listing,
+                $state,
+                $sale,
+                Transaction::firstWhere(['transaction_chain_hash' => $extrinsic->hash])
+            );
         } catch (\Throwable $e) {
             Log::error(
                 sprintf(

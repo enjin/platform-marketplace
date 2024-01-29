@@ -12,6 +12,7 @@ use Enjin\Platform\Marketplace\Models\MarketplaceListing;
 use Enjin\Platform\Marketplace\Models\MarketplaceState;
 use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\Traits\QueryDataOrFail;
 use Enjin\Platform\Models\Laravel\Block;
+use Enjin\Platform\Models\Transaction;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Codec;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\ListingCreated as ListingCreatedPolkadart;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\PolkadartEvent;
@@ -79,6 +80,11 @@ class ListingCreated implements SubstrateEvent
             )
         );
 
-        ListingCreatedEvent::safeBroadcast($listing, $state);
+        $extrinsic = $block->extrinsics[$event->extrinsicIndex];
+        ListingCreatedEvent::safeBroadcast(
+            $listing,
+            $state,
+            Transaction::firstWhere(['transaction_chain_hash' => $extrinsic->hash])
+        );
     }
 }

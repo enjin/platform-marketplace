@@ -12,11 +12,14 @@ class BidPlaced extends PlatformBroadcastEvent
     /**
      * Create a new event instance.
      */
-    public function __construct(Model $listing, Model $bid)
+    public function __construct(Model $listing, Model $bid, ?Model $transaction = null)
     {
         parent::__construct();
 
+        $this->model = $bid;
+
         $this->broadcastData = [
+            'idempotencyKey' => $transaction?->idempotency_key,
             'listingId' => $listing->listing_chain_id,
             'seller' => $listing->seller->address,
             'makeAssetId' => [

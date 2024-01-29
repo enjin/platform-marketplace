@@ -12,11 +12,14 @@ class ListingCreated extends PlatformBroadcastEvent
     /**
      * Create a new event instance.
      */
-    public function __construct(Model $listing, Model $state)
+    public function __construct(Model $listing, Model $state, ?Model $transaction = null)
     {
         parent::__construct();
 
+        $this->model = $listing;
+
         $this->broadcastData = [
+            'idempotencyKey' => $transaction?->idempotency_key,
             'listingId' => $listing->listing_chain_id,
             'seller' => $listing->seller->address,
             'makeAssetId' => [

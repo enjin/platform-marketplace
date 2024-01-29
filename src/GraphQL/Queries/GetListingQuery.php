@@ -4,12 +4,12 @@ namespace Enjin\Platform\Marketplace\GraphQL\Queries;
 
 use Closure;
 use Enjin\Platform\Marketplace\Models\MarketplaceListing;
+use Enjin\Platform\Marketplace\Rules\ListingExists;
 use Enjin\Platform\Rules\MaxBigInt;
 use Enjin\Platform\Rules\MinBigInt;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
-use Illuminate\Validation\Rule;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class GetListingQuery extends Query
@@ -81,13 +81,13 @@ class GetListingQuery extends Query
                 'required_without:listingId',
                 new MinBigInt(),
                 new MaxBigInt(),
-                Rule::exists('marketplace_listings', 'id'),
+                new ListingExists('id'),
             ],
             'listingId' => [
                 'bail',
                 'required_without:id',
                 'max:255',
-                Rule::exists('marketplace_listings', 'listing_chain_id'),
+                new ListingExists(),
             ],
         ];
     }

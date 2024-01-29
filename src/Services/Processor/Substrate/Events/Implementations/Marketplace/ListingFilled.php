@@ -8,6 +8,7 @@ use Enjin\Platform\Marketplace\Events\Substrate\Marketplace\ListingFilled as Lis
 use Enjin\Platform\Marketplace\Models\MarketplaceSale;
 use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\Traits\QueryDataOrFail;
 use Enjin\Platform\Models\Laravel\Block;
+use Enjin\Platform\Models\Transaction;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Codec;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\ListingFilled as ListingFilledPolkadart;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\PolkadartEvent;
@@ -57,7 +58,12 @@ class ListingFilled implements SubstrateEvent
                 )
             );
 
-            ListingFilledEvent::safeBroadcast($listing, $sale);
+            $extrinsic = $block->extrinsics[$event->extrinsicIndex];
+            ListingFilledEvent::safeBroadcast(
+                $listing,
+                $sale,
+                Transaction::firstWhere(['transaction_chain_hash' => $extrinsic->hash])
+            );
         } catch (\Throwable $e) {
             Log::error(
                 sprintf(

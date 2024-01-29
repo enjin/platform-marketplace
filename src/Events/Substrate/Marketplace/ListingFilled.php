@@ -12,11 +12,12 @@ class ListingFilled extends PlatformBroadcastEvent
     /**
      * Create a new event instance.
      */
-    public function __construct(Model $listing, Model $sale)
+    public function __construct(Model $listing, Model $sale, ?Model $transaction = null)
     {
         parent::__construct();
 
         $this->broadcastData = [
+            'idempotencyKey' => $transaction?->idempotency_key,
             'listingId' => $listing->listing_chain_id,
             'seller' => $listing->seller->address,
             'makeAssetId' => [
