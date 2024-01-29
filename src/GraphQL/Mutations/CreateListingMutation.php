@@ -27,7 +27,6 @@ use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class CreateListingMutation extends Mutation implements PlatformBlockchainTransaction
