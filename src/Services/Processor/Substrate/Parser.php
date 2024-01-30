@@ -45,11 +45,10 @@ class Parser extends BaseParser
             $collectionFilter = config('enjin-platform.indexing.filters.collections');
 
             if (!empty($collectionFilter)) {
-                $shouldParse = collect(config('enjin-platform.indexing.filters.collections'))
-                    ->contains([
-                        Arr::get($listingData, 'makeAssetId')->collectionId,
-                        Arr::get($listingData, 'takeAssetId')->collectionId,
-                    ]);
+                $shouldParse = in_array([
+                    Arr::get($listingData, 'makeAssetId')->collectionId,
+                    Arr::get($listingData, 'takeAssetId')->collectionId,
+                ], $collectionFilter);
 
                 if (!$shouldParse) {
                     continue;
