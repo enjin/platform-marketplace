@@ -37,18 +37,22 @@ class Parser extends BaseParser
         $insertData = [];
         $insertBids = [];
         $insertStates = [];
+
         foreach ($data as [$key, $listing]) {
             $listingKey = $this->codec->decoder()->listingStorageKey($key);
             $listingData = $this->codec->decoder()->listingStorageData($listing);
 
-            $shouldParse = collect(config('enjin-platform.indexing.filters.collections'))
-                ->contains([
+            $collectionFilter = config('enjin-platform.indexing.filters.collections');
+
+            if (!empty($collectionFilter)) {
+                $shouldParse = in_array([
                     Arr::get($listingData, 'makeAssetId')->collectionId,
                     Arr::get($listingData, 'takeAssetId')->collectionId,
-                ]);
+                ], $collectionFilter);
 
-            if (!$shouldParse) {
-                continue;
+                if (!$shouldParse) {
+                    continue;
+                }
             }
 
             $sellerWallet = $this->getCachedWallet(
