@@ -10,7 +10,8 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        Schema::table('market_place_sales', function (Blueprint $table) {
+        Schema::table('marketplace_sales', function (Blueprint $table) {
+            $table->dropForeign(['marketplace_listing_id']);
             $table->dropColumn('marketplace_listing_id');
         });
     }
@@ -20,7 +21,7 @@ return new class () extends Migration {
      */
     public function down(): void
     {
-        Schema::table('market_place_sales', function (Blueprint $table) {
+        Schema::table('marketplace_sales', function (Blueprint $table) {
             $table->foreignId('marketplace_listing_id')->index()->constrained('marketplace_listings');
         });
     }

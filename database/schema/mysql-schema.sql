@@ -201,14 +201,17 @@ DROP TABLE IF EXISTS `marketplace_sales`;
 CREATE TABLE `marketplace_sales` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `listing_chain_id` varchar(255) NOT NULL,
+  `marketplace_listing_id` bigint unsigned NOT NULL,
   `amount` varchar(255) NOT NULL,
   `price` varchar(255) NOT NULL,
   `wallet_id` bigint unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
+  KEY `marketplace_sales_marketplace_listing_id_index` (`marketplace_listing_id`),
   KEY `marketplace_sales_wallet_id_index` (`wallet_id`),
   KEY `marketplace_sales_listing_chain_id_index` (`listing_chain_id`),
+  CONSTRAINT `marketplace_sales_marketplace_listing_id_foreign` FOREIGN KEY (`marketplace_listing_id`) REFERENCES `marketplace_listings` (`id`),
   CONSTRAINT `marketplace_sales_wallet_id_foreign` FOREIGN KEY (`wallet_id`) REFERENCES `wallets` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
