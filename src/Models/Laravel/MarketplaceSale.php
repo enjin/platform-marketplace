@@ -28,7 +28,6 @@ class MarketplaceSale extends BaseModel
      * @var array
      */
     protected $fillable = [
-        'marketplace_listing_id',
         'listing_chain_id',
         'wallet_id',
         'price',

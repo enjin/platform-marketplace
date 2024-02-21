@@ -127,7 +127,6 @@ class TestCaseGraphQL extends BaseTestCase
             MarketplaceSale::factory(fake()->numberBetween(2, 10))
                 ->create([
                     'wallet_id' => $this->wallet->id,
-                    'marketplace_listing_id' => $listing->id,
                     'listing_chain_id' => $listing->listing_chain_id,
                 ])
         );
