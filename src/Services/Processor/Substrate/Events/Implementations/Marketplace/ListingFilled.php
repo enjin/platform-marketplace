@@ -37,7 +37,6 @@ class ListingFilled implements SubstrateEvent
             $buyer = WalletService::firstOrStore(['account' => Account::parseAccount($event->buyer)]);
 
             $sale = MarketplaceSale::create([
-                'marketplace_listing_id' => $listing->id,
                 'listing_chain_id' => $listing->listing_chain_id,
                 'wallet_id' => $buyer->id,
                 'price' => $listing->price,

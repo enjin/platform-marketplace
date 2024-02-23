@@ -28,7 +28,6 @@ class MarketplaceSale extends BaseModel
      * @var array
      */
     protected $fillable = [
-        'marketplace_listing_id',
         'listing_chain_id',
         'wallet_id',
         'price',
@@ -58,7 +57,7 @@ class MarketplaceSale extends BaseModel
      */
     public function listing(): BelongsTo
     {
-        return $this->belongsTo(MarketplaceListing::class, 'marketplace_listing_id');
+        return $this->belongsTo(MarketplaceListing::class, 'listing_chain_id', 'listing_chain_id');
     }
 
     /**
