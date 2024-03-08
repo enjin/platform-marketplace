@@ -27,6 +27,18 @@ class GetListingTest extends TestCaseGraphQL
             ['listingId' => $listing->listing_chain_id],
         );
         $this->assertNotEmpty($response);
+
+        $response = $this->graphql(
+            $this->method,
+            ['collectionId' => $listing->make_collection_chain_id],
+        );
+        $this->assertNotEmpty($response);
+
+        $response = $this->graphql(
+            $this->method,
+            ['states' => [$listing->state->state]],
+        );
+        $this->assertNotEmpty($response);
     }
 
     public function test_it_will_fail_with_invalid_parameter_id(): void
