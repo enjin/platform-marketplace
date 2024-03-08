@@ -145,7 +145,7 @@ class TestCaseGraphQL extends BaseTestCase
     /**
      * Create listing.
      */
-    protected function createListing(?int $count = null, ?string $state = null): Collection | MarketplaceListing
+    protected function createListing(?int $count = null, ?string $state = 'ACTIVE'): Collection | MarketplaceListing
     {
         $listing = MarketplaceListing::factory($count)->create(['seller_wallet_id' => $this->wallet->id]);
         if ($listing instanceof MarketplaceListing) {
