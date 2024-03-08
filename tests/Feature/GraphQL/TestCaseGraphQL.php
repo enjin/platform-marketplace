@@ -133,7 +133,7 @@ class TestCaseGraphQL extends BaseTestCase
 
         $listing->setRelation(
             'states',
-            MarketplaceState::factory(fake()->numberBetween(1, 1))->make(['marketplace_listing_id' => $listing->id])
+            MarketplaceState::factory(fake()->numberBetween(1, 1))->create(['marketplace_listing_id' => $listing->id])
         );
     }
 
