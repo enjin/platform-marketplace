@@ -19,7 +19,7 @@ class CancelListingTest extends TestCaseGraphQL
 
     public function test_it_can_cancel_listing(): void
     {
-        $listing = $this->createListing();
+        $listing = $this->createListing(null, 'ACTIVE');
         $response = $this->graphql(
             $this->method,
             $params = ['listingId' => $listing->listing_chain_id]

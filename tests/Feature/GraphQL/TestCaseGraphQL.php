@@ -4,6 +4,7 @@ namespace Enjin\Platform\Marketplace\Tests\Feature\GraphQL;
 
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Enjin\Platform\CoreServiceProvider;
+use Enjin\Platform\Marketplace\Enums\ListingState;
 use Enjin\Platform\Marketplace\MarketplaceServiceProvider;
 use Enjin\Platform\MarketPlace\Models\MarketplaceBid;
 use Enjin\Platform\Marketplace\Models\MarketplaceListing;
@@ -97,7 +98,7 @@ class TestCaseGraphQL extends BaseTestCase
     /**
      * Seed marketplace listing related data.
      */
-    protected function seedRelatedData(MarketplaceListing $listing): void
+    protected function seedRelatedData(MarketplaceListing $listing, ?string $state): void
     {
         LaravelCollection::updateOrCreate(
             ['collection_chain_id' => $listing->make_collection_chain_id],
@@ -133,22 +134,26 @@ class TestCaseGraphQL extends BaseTestCase
 
         $listing->setRelation(
             'states',
-            MarketplaceState::factory(fake()->numberBetween(1, 1))->create(['marketplace_listing_id' => $listing->id])
+            MarketplaceState::factory(fake()->numberBetween(1, 1))
+                ->create([
+                    'marketplace_listing_id' => $listing->id,
+                    'state' => $state ?? ListingState::caseNamesAsCollection()->random(),
+                ])
         );
     }
 
     /**
      * Create listing.
      */
-    protected function createListing(?int $count = null): Collection | MarketplaceListing
+    protected function createListing(?int $count = null, ?string $state = null): Collection | MarketplaceListing
     {
         $listing = MarketplaceListing::factory($count)->create(['seller_wallet_id' => $this->wallet->id]);
         if ($listing instanceof MarketplaceListing) {
-            $this->seedRelatedData($listing);
+            $this->seedRelatedData($listing, $state);
         } else {
             $listing->each(
-                function (MarketplaceListing $listing) {
-                    $this->seedRelatedData($listing);
+                function (MarketplaceListing $listing) use ($state) {
+                    $this->seedRelatedData($listing, $state);
                 }
             );
         }
