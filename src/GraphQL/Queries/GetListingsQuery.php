@@ -72,6 +72,15 @@ class GetListingsQuery extends Query
                 'type' => GraphQL::type('MultiTokenIdInput'),
                 'description' => __('enjin-platform-marketplace::type.marketplace_listing.field.takeAssetId'),
             ],
+            'collectionIds' => [
+                'type' => GraphQL::type('[BigInt]'),
+                'description' => __('enjin-platform::input_type.multi_token_id.field.collectionId'),
+                'rules' => [new MinBigInt(), new MaxBigInt(Hex::MAX_UINT128)],
+            ],
+            'states' => [
+                'type' => GraphQL::type('[ListingStateEnum!]'),
+                'description' => __('enjin-platform-marketplace::type.listing_state.description'),
+            ],
         ]);
     }
 
@@ -110,7 +119,18 @@ class GetListingsQuery extends Query
                     'take_collection_chain_id' =>  Arr::get($takeAsset, 'collectionId'),
                     'take_token_chain_id' => $this->encodeTokenId(Arr::get($args, 'takeAssetId')),
                 ])
-            )->cursorPaginateWithTotalDesc('marketplace_listings.id', $args['first']);
+            )->when(
+                $collectionId = Arr::get($args, 'collectionIds'),
+                fn ($query) => $query->where(
+                    fn ($subquery) => $subquery->whereIn('make_collection_chain_id', $collectionId)
+                        ->orWhereIn('take_collection_chain_id', $collectionId)
+                )
+            )
+            ->when(
+                $states = Arr::get($args, 'states'),
+                fn ($query) => $query->whereHas('state', fn ($query) => $query->whereIn('state', $states))
+            )
+            ->cursorPaginateWithTotalDesc('marketplace_listings.id', $args['first']);
     }
 
     /**

@@ -4,6 +4,8 @@ query GetListings(
   $account: String
   $makeAssetId: MultiTokenIdInput
   $takeAssetId: MultiTokenIdInput
+  $collectionIds: [BigInt]
+  $states: [ListingStateEnum!]
 ) {
   GetListings(
     ids: $ids
@@ -11,6 +13,8 @@ query GetListings(
     account: $account
     makeAssetId: $makeAssetId
     takeAssetId: $takeAssetId
+    collectionIds: $collectionIds
+    states: $states
   ) {
     totalCount
     pageInfo {
