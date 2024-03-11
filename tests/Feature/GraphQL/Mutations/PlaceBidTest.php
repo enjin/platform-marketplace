@@ -22,7 +22,10 @@ class PlaceBidTest extends TestCaseGraphQL
         $listing = $this->createListing();
         $response = $this->graphql(
             $this->method,
-            $params = ['listingId' => $listing->listing_chain_id, 'price' => fake()->numberBetween(1, 1000)]
+            $params = [
+                'listingId' => $listing->listing_chain_id,
+                'price' => fake()->numberBetween(1, $listing->price + 1000),
+            ]
         );
         $this->assertEquals(
             $response['encodedData'],
