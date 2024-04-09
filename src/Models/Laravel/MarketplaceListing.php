@@ -123,7 +123,7 @@ class MarketplaceListing extends BaseModel
         );
     }
 
-    protected function modelOwner(): Attribute
+    protected function ownerId(): Attribute
     {
         return Attribute::make(
             get: fn () => $this->seller_wallet_id,
