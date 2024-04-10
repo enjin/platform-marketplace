@@ -3,7 +3,6 @@
 namespace Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\Marketplace;
 
 use Carbon\Carbon;
-use Enjin\BlockchainTools\HexConverter;
 use Enjin\Platform\Marketplace\Enums\FeeSide;
 use Enjin\Platform\Marketplace\Enums\ListingState;
 use Enjin\Platform\Marketplace\Enums\ListingType;
@@ -29,17 +28,14 @@ class ListingCreated extends MarketplaceSubstrateEvent
             return;
         }
 
-
-        ray($event);
-
-        throw new \Exception('AuctionFinalized');
         if (!$this->shouldIndexCollection(Arr::get($event->makeAssetId, 'collection_id')) && !$this->shouldIndexCollection(Arr::get($event->takeAssetId, 'collection_id'))) {
             return;
         }
 
         $seller = $this->firstOrStoreAccount($event->seller);
-        $listing = MarketplaceListing::create([
+        $listing = MarketplaceListing::updateOrCreate([
             'listing_chain_id' => $event->listingId,
+        ], [
             'seller_wallet_id' => $seller->id,
             'make_collection_chain_id' => Arr::get($event->makeAssetId, 'collection_id'),
             'make_token_chain_id' => Arr::get($event->makeAssetId, 'token_id'),
@@ -51,11 +47,11 @@ class ListingCreated extends MarketplaceSubstrateEvent
             'fee_side' => FeeSide::tryFrom($event->feeSide)?->name,
             'creation_block' => $event->creationBlock,
             'deposit' => $event->deposit,
-            'salt' => HexConverter::bytesToHex($event->salt),
-            'type' => is_string($event->data) ? ListingType::FIXED_PRICE->name : ListingType::AUCTION->name,
+            'salt' => $event->salt,
+            'type' => ListingType::from(array_key_first($event->state))->name,
             'start_block' => Arr::get($event->data, 'Auction.start_block'),
             'end_block' => Arr::get($event->data, 'Auction.end_block'),
-            'amount_filled' => Arr::get($event->state, 'FixedPrice.amount_filled'),
+            'amount_filled' => $this->getValue($event->state, ['FixedPrice.amount_filled', 'FixedPrice']),
             'created_at' => $now = Carbon::now(),
             'updated_at' => $now,
         ]);

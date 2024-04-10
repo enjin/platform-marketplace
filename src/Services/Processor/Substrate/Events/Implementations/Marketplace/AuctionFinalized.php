@@ -25,10 +25,6 @@ class AuctionFinalized extends MarketplaceSubstrateEvent
             return;
         }
 
-        ray($event);
-
-        throw new \Exception('AuctionFinalized');
-
         try {
             $listing = $this->getListing($event->listingId);
             $bidder = $this->firstOrStoreAccount($event->winningBidder);
