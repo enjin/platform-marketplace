@@ -120,7 +120,7 @@ class CreateListingTest extends TestCaseGraphQL
             array_merge($data, [
                 'makeAssetId' => [
                     'collectionId' => fake()->numberBetween(3000, 4000),
-                    'tokenId' => ['integer' =>fake()->numberBetween(3000, 4000)],
+                    'tokenId' => ['integer' => fake()->numberBetween(3000, 4000)],
                 ],
             ]),
             true
@@ -137,7 +137,7 @@ class CreateListingTest extends TestCaseGraphQL
             array_merge($data, [
                 'makeAssetId' => [
                     'collectionId' => Hex::MAX_UINT256 + 1,
-                    'tokenId' => ['integer' =>Hex::MAX_UINT256 + 1],
+                    'tokenId' => ['integer' => Hex::MAX_UINT256 + 1],
                 ],
             ]),
             true

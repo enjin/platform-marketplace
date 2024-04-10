@@ -126,7 +126,7 @@ class MarketplaceListingType extends Type
                             $listing?->sales,
                             $args['first'],
                             Arr::get($args, 'after') ? Cursor::fromEncoded($args['after']) : null,
-                            ['parameters'=>['id']]
+                            ['parameters' => ['id']]
                         ),
                         'total' => (int) $listing?->sales_count,
                     ];
@@ -143,7 +143,7 @@ class MarketplaceListingType extends Type
                             $listing?->bids,
                             $args['first'],
                             Arr::get($args, 'after') ? Cursor::fromEncoded($args['after']) : null,
-                            ['parameters'=>['id']]
+                            ['parameters' => ['id']]
                         ),
                         'total' => (int) $listing?->bids_count,
                     ];

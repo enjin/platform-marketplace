@@ -1,18 +1,18 @@
 <?php
 
-namespace Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\Traits;
+namespace Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations;
 
 use Enjin\Platform\Exceptions\PlatformException;
 use Enjin\Platform\Marketplace\Models\MarketplaceListing;
-use Enjin\Platform\Services\Processor\Substrate\Events\Implementations\Traits\QueryDataOrFail as QueryDataOrFailBase;
+use Enjin\Platform\Services\Processor\Substrate\Events\SubstrateEvent;
 use Illuminate\Database\Eloquent\Model;
 
-trait QueryDataOrFail
+abstract class MarketplaceSubstrateEvent extends SubstrateEvent
 {
-    use QueryDataOrFailBase;
-
     /**
      * Returns the listing with the specified listing ID.
+     *
+     * @throws PlatformException
      */
     protected function getListing(string $listingId): Model
     {

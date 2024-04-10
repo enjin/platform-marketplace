@@ -20,8 +20,8 @@ use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class GetListingsQuery extends Query
 {
-    use HasTokenIdFieldRules;
     use HasEncodableTokenId;
+    use HasTokenIdFieldRules;
 
     protected $middleware = [
         ResolvePage::class,

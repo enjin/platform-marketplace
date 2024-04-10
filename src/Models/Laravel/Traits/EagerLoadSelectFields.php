@@ -29,7 +29,7 @@ trait EagerLoadSelectFields
         static::$query = $query;
         $queryPlan = $resolveInfo->lookAhead()->queryPlan();
 
-        switch($query) {
+        switch ($query) {
             case 'GetListings':
             case 'GetListing':
                 [$select, $with, $withCount] = static::loadListings(
@@ -247,7 +247,7 @@ trait EagerLoadSelectFields
         $key = $parent ? "{$parent}.{$attribute}" : $attribute;
         $alias = static::getAlias($attribute, $parentType);
         $args = Arr::get($selections, $attribute . '.args', []);
-        switch($alias) {
+        switch ($alias) {
             case 'listing':
                 $relations = static::loadListings(
                     $selections,

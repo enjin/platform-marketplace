@@ -20,8 +20,7 @@ class MinimumPrice implements DataAwareRule, ValidationRule
     /**
      * Set the data under validation.
      *
-     * @param array $data
-     *
+     * @param  array  $data
      * @return $this
      */
     public function setData($data)

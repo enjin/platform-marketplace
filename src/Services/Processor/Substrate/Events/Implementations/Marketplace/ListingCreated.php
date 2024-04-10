@@ -10,40 +10,36 @@ use Enjin\Platform\Marketplace\Enums\ListingType;
 use Enjin\Platform\Marketplace\Events\Substrate\Marketplace\ListingCreated as ListingCreatedEvent;
 use Enjin\Platform\Marketplace\Models\MarketplaceListing;
 use Enjin\Platform\Marketplace\Models\MarketplaceState;
-use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\Traits\QueryDataOrFail;
+use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\MarketplaceSubstrateEvent;
 use Enjin\Platform\Models\Laravel\Block;
-use Enjin\Platform\Models\Transaction;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Codec;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\ListingCreated as ListingCreatedPolkadart;
-use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\PolkadartEvent;
-use Enjin\Platform\Services\Processor\Substrate\Events\SubstrateEvent;
-use Enjin\Platform\Support\Account;
-use Facades\Enjin\Platform\Services\Database\WalletService;
+use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Event;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
-class ListingCreated implements SubstrateEvent
+class ListingCreated extends MarketplaceSubstrateEvent
 {
-    use QueryDataOrFail;
-
     /**
      * Handles the listing created event.
      */
-    public function run(PolkadartEvent $event, Block $block, Codec $codec): void
+    public function run(Event $event, Block $block, Codec $codec): void
     {
         if (!$event instanceof ListingCreatedPolkadart) {
             return;
         }
 
+
+        ray($event);
+
+        throw new \Exception('AuctionFinalized');
         if (!$this->shouldIndexCollection(Arr::get($event->makeAssetId, 'collection_id')) && !$this->shouldIndexCollection(Arr::get($event->takeAssetId, 'collection_id'))) {
             return;
         }
 
-        $listingId = HexConverter::prefix($event->listingId);
-        $seller = WalletService::firstOrStore(['account' => Account::parseAccount($event->seller)]);
-
+        $seller = $this->firstOrStoreAccount($event->seller);
         $listing = MarketplaceListing::create([
-            'listing_chain_id' => $listingId,
+            'listing_chain_id' => $event->listingId,
             'seller_wallet_id' => $seller->id,
             'make_collection_chain_id' => Arr::get($event->makeAssetId, 'collection_id'),
             'make_token_chain_id' => Arr::get($event->makeAssetId, 'token_id'),
@@ -75,16 +71,15 @@ class ListingCreated implements SubstrateEvent
         Log::info(
             sprintf(
                 'Listing %s (id: %s) was created.',
-                $listingId,
+                $event->listingId,
                 $listing->id,
             )
         );
 
-        $extrinsic = $block->extrinsics[$event->extrinsicIndex];
         ListingCreatedEvent::safeBroadcast(
             $listing,
             $state,
-            Transaction::firstWhere(['transaction_chain_hash' => $extrinsic->hash])
+            $this->getTransaction($block, $event->extrinsicIndex),
         );
     }
 }

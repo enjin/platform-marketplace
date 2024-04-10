@@ -86,9 +86,9 @@ class TestCaseGraphQL extends BaseTestCase
             throw new ExpectationFailedException($assertMessage);
         }
 
-        if ('validation' === Arr::get($data, 'errors.0.message')) {
+        if (Arr::get($data, 'errors.0.message') === 'validation') {
             $data['error'] = Arr::first($result->errors)?->getPrevious()->getValidatorMessages()->toArray();
-        } elseif (null !== Arr::get($data, 'errors.0.message')) {
+        } elseif (Arr::get($data, 'errors.0.message') !== null) {
             $data['error'] = $data['errors'][0]['message'];
         }
 
@@ -145,7 +145,7 @@ class TestCaseGraphQL extends BaseTestCase
     /**
      * Create listing.
      */
-    protected function createListing(?int $count = null, ?string $state = 'ACTIVE'): Collection | MarketplaceListing
+    protected function createListing(?int $count = null, ?string $state = 'ACTIVE'): Collection|MarketplaceListing
     {
         $listing = MarketplaceListing::factory($count)->create(['seller_wallet_id' => $this->wallet->id]);
         if ($listing instanceof MarketplaceListing) {
@@ -226,7 +226,7 @@ class TestCaseGraphQL extends BaseTestCase
     /**
      * Get package providers.
      *
-     * @param mixed $app
+     * @param  mixed  $app
      */
     protected function getPackageProviders($app): array
     {
@@ -239,7 +239,7 @@ class TestCaseGraphQL extends BaseTestCase
     /**
      * Get package aliases.
      *
-     * @param mixed $app
+     * @param  mixed  $app
      */
     protected function getPackageAliases($app): array
     {
@@ -249,7 +249,7 @@ class TestCaseGraphQL extends BaseTestCase
     /**
      * Define environment.
      *
-     * @param mixed $app
+     * @param  mixed  $app
      */
     protected function defineEnvironment($app): void
     {
