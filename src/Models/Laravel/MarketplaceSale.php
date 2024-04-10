@@ -76,4 +76,11 @@ class MarketplaceSale extends BaseModel
             get: fn () => $this->id
         );
     }
+
+    protected function ownerId(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->loadMissing('listing')?->listing?->seller_wallet_id,
+        );
+    }
 }

@@ -122,4 +122,11 @@ class MarketplaceListing extends BaseModel
             get: fn () => $this->listing_chain_id
         );
     }
+
+    protected function ownerId(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->seller_wallet_id,
+        );
+    }
 }
