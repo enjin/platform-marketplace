@@ -3,38 +3,29 @@
 namespace Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\Marketplace;
 
 use Carbon\Carbon;
-use Enjin\BlockchainTools\HexConverter;
 use Enjin\Platform\Marketplace\Events\Substrate\Marketplace\BidPlaced as BidPlacedEvent;
 use Enjin\Platform\Marketplace\Models\MarketplaceBid;
-use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\Traits\QueryDataOrFail;
+use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\MarketplaceSubstrateEvent;
 use Enjin\Platform\Models\Laravel\Block;
-use Enjin\Platform\Models\Transaction;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Codec;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\BidPlaced as BidPlacedPolkadart;
-use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\PolkadartEvent;
-use Enjin\Platform\Services\Processor\Substrate\Events\SubstrateEvent;
-use Enjin\Platform\Support\Account;
-use Facades\Enjin\Platform\Services\Database\WalletService;
+use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Event;
 use Illuminate\Support\Facades\Log;
 
-class BidPlaced implements SubstrateEvent
+class BidPlaced extends MarketplaceSubstrateEvent
 {
-    use QueryDataOrFail;
-
     /**
      * Handles the bid placed event.
      */
-    public function run(PolkadartEvent $event, Block $block, Codec $codec): void
+    public function run(Event $event, Block $block, Codec $codec): void
     {
         if (!$event instanceof BidPlacedPolkadart) {
             return;
         }
 
-        $listingId = HexConverter::prefix($event->listingId);
-
         try {
-            $listing = $this->getListing($listingId);
-            $bidder = WalletService::firstOrStore(['account' => Account::parseAccount($event->bidder)]);
+            $listing = $this->getListing($event->listingId);
+            $bidder = $this->firstOrStoreAccount($event->bidder);
 
             $bid = MarketplaceBid::create([
                 'marketplace_listing_id' => $listing->id,
@@ -51,22 +42,21 @@ class BidPlaced implements SubstrateEvent
                     $event->bidder,
                     $bidder->id,
                     $bid->id,
-                    $listingId,
+                    $event->listingId,
                     $listing->id,
                 )
             );
 
-            $extrinsic = $block->extrinsics[$event->extrinsicIndex];
             BidPlacedEvent::safeBroadcast(
                 $listing,
                 $bid,
-                Transaction::firstWhere(['transaction_chain_hash' => $extrinsic->hash])
+                $this->getTransaction($block, $event->extrinsicIndex),
             );
         } catch (\Throwable $e) {
             Log::error(
                 sprintf(
                     'Listing %s was filled but could not be found in the database.',
-                    $listingId,
+                    $event->listingId,
                 )
             );
         }

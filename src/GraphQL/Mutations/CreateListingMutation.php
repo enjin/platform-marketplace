@@ -34,9 +34,9 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
     use HasIdempotencyField;
     use HasSigningAccountField;
     use HasSimulateField;
+    use HasTokenIdFieldRules;
     use HasTransactionDeposit;
     use StoresTransactions;
-    use HasTokenIdFieldRules;
 
     /**
      * Get the mutation's attributes.

@@ -12,9 +12,9 @@ use Staudenmeir\EloquentEagerLimit\HasEagerLimit;
 
 class MarketplaceListing extends BaseModel
 {
+    use HasEagerLimit;
     use HasFactory;
     use Traits\EagerLoadSelectFields;
-    use HasEagerLimit;
 
     /**
      * The attributes that aren't mass assignable.

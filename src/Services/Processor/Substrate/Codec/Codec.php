@@ -22,7 +22,7 @@ class Codec extends BaseCodec
     /**
      * Returns the marketplace encoder.
      */
-    public function encoder(): Encoder
+    public function encoder(): MarketplaceEncoder
     {
         return $this->encoder;
     }
@@ -30,7 +30,7 @@ class Codec extends BaseCodec
     /**
      * Returns the marketplace decoder.
      */
-    public function decoder(): Decoder
+    public function decoder(): MarketplaceDecoder
     {
         return $this->decoder;
     }
