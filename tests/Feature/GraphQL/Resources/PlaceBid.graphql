@@ -1,5 +1,5 @@
-mutation PlaceBid($listingId: String!, $price: BigInt!) {
-  PlaceBid(listingId: $listingId, price: $price) {
+mutation PlaceBid($listingId: String!, $price: BigInt!, $skipValidation: Boolean) {
+  PlaceBid(listingId: $listingId, price: $price, skipValidation: $skipValidation) {
     id
     transactionId
     transactionHash

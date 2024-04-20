@@ -47,7 +47,51 @@ class CreateListingTest extends TestCaseGraphQL
             Arr::get($params, 'takeAssetId.collectionId'),
             $this->encodeTokenId(Arr::get($params, 'takeAssetId'))
         );
-        $params['auctionData'] = ($data = Arr::get($params, 'auctionData'))
+        $params['auctionData'] = (Arr::get($params, 'auctionData'))
+            ? new AuctionDataParams(Arr::get($params, 'auctionData.startBlock'), Arr::get($params, 'auctionData.endBlock'))
+            : null;
+
+        $this->assertEquals(
+            $response['encodedData'],
+            TransactionSerializer::encode($this->method, CreateListingMutation::getEncodableParams(...$params))
+        );
+
+        $this->assertNull(Arr::get($response, 'wallet.account.publicKey'));
+    }
+
+    public function test_it_can_skip_validation(): void
+    {
+        $response = $this->graphql(
+            $this->method,
+            $params = [
+                'makeAssetId' => [
+                    'collectionId' => fake()->numberBetween(10000, 20000),
+                    'tokenId' => ['integer' => fake()->numberBetween(10000, 20000)],
+                ],
+                'takeAssetId' => [
+                    'collectionId' => fake()->numberBetween(10000, 20000),
+                    'tokenId' => ['integer' => fake()->numberBetween(10000, 20000)],
+                ],
+                'amount' => fake()->numberBetween(1, 1000),
+                'price' => fake()->numberBetween(1, 1000),
+                'salt' => fake()->text(10),
+                'auctionData' => [
+                    'startBlock' => fake()->numberBetween(1011, 5000),
+                    'endBlock' => fake()->numberBetween(5001, 10000),
+                ],
+                'skipValidation' => true,
+            ]
+        );
+
+        $params['makeAssetId'] = new MultiTokensTokenAssetIdParams(
+            Arr::get($params, 'makeAssetId.collectionId'),
+            $this->encodeTokenId(Arr::get($params, 'makeAssetId'))
+        );
+        $params['takeAssetId'] = new MultiTokensTokenAssetIdParams(
+            Arr::get($params, 'takeAssetId.collectionId'),
+            $this->encodeTokenId(Arr::get($params, 'takeAssetId'))
+        );
+        $params['auctionData'] = (Arr::get($params, 'auctionData'))
             ? new AuctionDataParams(Arr::get($params, 'auctionData.startBlock'), Arr::get($params, 'auctionData.endBlock'))
             : null;
 

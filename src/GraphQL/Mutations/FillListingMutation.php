@@ -6,6 +6,7 @@ use Closure;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\Platform\Facades\TransactionSerializer;
 use Enjin\Platform\GraphQL\Schemas\Primary\Substrate\Traits\StoresTransactions;
+use Enjin\Platform\GraphQL\Schemas\Primary\Traits\HasSkippableRules;
 use Enjin\Platform\GraphQL\Schemas\Primary\Traits\HasTransactionDeposit;
 use Enjin\Platform\GraphQL\Types\Input\Substrate\Traits\HasIdempotencyField;
 use Enjin\Platform\GraphQL\Types\Input\Substrate\Traits\HasSigningAccountField;
@@ -15,6 +16,7 @@ use Enjin\Platform\Marketplace\Rules\ListingNotCancelled;
 use Enjin\Platform\Models\Transaction;
 use Enjin\Platform\Rules\MaxBigInt;
 use Enjin\Platform\Rules\MinBigInt;
+use Enjin\Platform\Rules\ValidHex;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Support\Arr;
@@ -26,6 +28,7 @@ class FillListingMutation extends Mutation implements PlatformBlockchainTransact
     use HasIdempotencyField;
     use HasSigningAccountField;
     use HasSimulateField;
+    use HasSkippableRules;
     use HasTransactionDeposit;
     use StoresTransactions;
 
@@ -65,6 +68,7 @@ class FillListingMutation extends Mutation implements PlatformBlockchainTransact
             ...$this->getSigningAccountField(),
             ...$this->getIdempotencyField(),
             ...$this->getSimulateField(),
+            ...$this->getSkipValidationField(),
         ];
     }
 
@@ -95,9 +99,23 @@ class FillListingMutation extends Mutation implements PlatformBlockchainTransact
     }
 
     /**
-     * Get the mutation's request validation rules.
+     * Get the common rules.
      */
-    protected function rules(array $args = []): array
+    protected function rulesCommon(array $args): array
+    {
+        return [
+            'amount' => [
+                'bail',
+                new MinBigInt(1),
+                new MaxBigInt(),
+            ],
+        ];
+    }
+
+    /**
+     * Get the mutation's validation rules.
+     */
+    protected function rulesWithValidation(array $args): array
     {
         return [
             'listingId' => [
@@ -106,10 +124,20 @@ class FillListingMutation extends Mutation implements PlatformBlockchainTransact
                 'max:255',
                 new ListingNotCancelled(),
             ],
-            'amount' => [
+        ];
+    }
+
+    /**
+     * Get the mutation's validation rules without DB rules.
+     */
+    protected function rulesWithoutValidation(array $args): array
+    {
+        return [
+            'listingId' => [
                 'bail',
-                new MinBigInt(1),
-                new MaxBigInt(),
+                'filled',
+                'max:255',
+                new ValidHex(32),
             ],
         ];
     }

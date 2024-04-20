@@ -1,5 +1,5 @@
-mutation FinalizeAuction($listingId: String!) {
-  FinalizeAuction(listingId: $listingId) {
+mutation FinalizeAuction($listingId: String!, $skipValidation: Boolean) {
+  FinalizeAuction(listingId: $listingId, skipValidation: $skipValidation) {
     id
     transactionId
     transactionHash

@@ -6,6 +6,7 @@ mutation CreateListing(
   $salt: String!
   $auctionData: AuctionDataInputType
   $signingAccount: String
+  $skipValidation: Boolean
 ) {
   CreateListing(
     makeAssetId: $makeAssetId
@@ -15,6 +16,7 @@ mutation CreateListing(
     salt: $salt
     auctionData: $auctionData
     signingAccount: $signingAccount
+    skipValidation: $skipValidation
   ) {
     id
     transactionId
