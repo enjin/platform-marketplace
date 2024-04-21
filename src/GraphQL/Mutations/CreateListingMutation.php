@@ -6,6 +6,7 @@ use Closure;
 use Enjin\BlockchainTools\HexConverter;
 use Enjin\Platform\Facades\TransactionSerializer;
 use Enjin\Platform\GraphQL\Schemas\Primary\Substrate\Traits\StoresTransactions;
+use Enjin\Platform\GraphQL\Schemas\Primary\Traits\HasSkippableRules;
 use Enjin\Platform\GraphQL\Schemas\Primary\Traits\HasTokenIdFieldRules;
 use Enjin\Platform\GraphQL\Schemas\Primary\Traits\HasTransactionDeposit;
 use Enjin\Platform\GraphQL\Types\Input\Substrate\Traits\HasIdempotencyField;
@@ -34,6 +35,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
     use HasIdempotencyField;
     use HasSigningAccountField;
     use HasSimulateField;
+    use HasSkippableRules;
     use HasTokenIdFieldRules;
     use HasTransactionDeposit;
     use StoresTransactions;
@@ -90,6 +92,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
             ...$this->getSigningAccountField(),
             ...$this->getIdempotencyField(),
             ...$this->getSimulateField(),
+            ...$this->getSkipValidationField(),
         ];
     }
 
@@ -145,7 +148,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         ];
     }
 
-    protected function makeOrTakeRule(?string $collectionId = null, ?bool $isMake = true): array
+    protected function makeOrTakeRuleExist(?string $collectionId = null, ?bool $isMake = true): array
     {
         $makeOrTake = $isMake ? 'makeAssetId' : 'takeAssetId';
 
@@ -164,13 +167,49 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         ];
     }
 
-    /**
-     * Get the mutation's request validation rules.
-     */
-    protected function rules(array $args = []): array
+    protected function makeOrTakeRule(?string $collectionId = null, ?bool $isMake = true): array
     {
-        $makeRule = $this->makeOrTakeRule($makeCollection = Arr::get($args, 'makeAssetId.collectionId'));
-        $takeRule = $this->makeOrTakeRule($takeCollection = Arr::get($args, 'takeAssetId.collectionId'), false);
+        $makeOrTake = $isMake ? 'makeAssetId' : 'takeAssetId';
+
+        return $collectionId === '0' ? [] : [
+            $makeOrTake . '.collectionId' => [
+                'bail',
+                'required_with:' . $makeOrTake . '.tokenId',
+                new MinBigInt(),
+                new MaxBigInt(Hex::MAX_UINT128),
+            ],
+        ];
+    }
+
+    /**
+     * Get the common rules.
+     */
+    protected function rulesCommon(array $args): array
+    {
+        return [
+            'price' => [
+                'bail',
+                new MinBigInt(),
+                new MaxBigInt(),
+            ],
+            'salt' => ['bail', 'filled', 'max:255'],
+            'auctionData.endBlock' => [
+                'bail',
+                'required_with:auctionData.startBlock',
+                new MinBigInt(),
+                new MaxBigInt(Hex::MAX_UINT32),
+                'gt:auctionData.startBlock',
+            ],
+        ];
+    }
+
+    /**
+     * Get the mutation's validation rules.
+     */
+    protected function rulesWithValidation(array $args): array
+    {
+        $makeRule = $this->makeOrTakeRuleExist($makeCollection = Arr::get($args, 'makeAssetId.collectionId'));
+        $takeRule = $this->makeOrTakeRuleExist($takeCollection = Arr::get($args, 'takeAssetId.collectionId'), false);
 
         return [
             'makeAssetId' => new TokenExistsInCollection($makeCollection),
@@ -185,12 +224,6 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 new MaxBigInt(),
                 new EnoughTokenSupply(),
             ],
-            'price' => [
-                'bail',
-                new MinBigInt(),
-                new MaxBigInt(),
-            ],
-            'salt' => ['bail', 'filled', 'max:255'],
             'auctionData.startBlock' => [
                 'bail',
                 'required_with:auctionData.endBlock',
@@ -199,12 +232,33 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 new FutureBlock(),
                 'lte:auctionData.endBlock',
             ],
-            'auctionData.endBlock' => [
+        ];
+    }
+
+    /**
+     * Get the mutation's validation rules without DB rules.
+     */
+    protected function rulesWithoutValidation(array $args): array
+    {
+        $makeRule = $this->makeOrTakeRule(Arr::get($args, 'makeAssetId.collectionId'));
+        $takeRule = $this->makeOrTakeRule(Arr::get($args, 'takeAssetId.collectionId'), false);
+
+        return [
+            ...$makeRule,
+            ...$this->getTokenFieldRules('makeAssetId'),
+            ...$takeRule,
+            ...$this->getTokenFieldRules('takeAssetId'),
+            'amount' => [
                 'bail',
-                'required_with:auctionData.startBlock',
+                new MinBigInt(1),
+                new MaxBigInt(),
+            ],
+            'auctionData.startBlock' => [
+                'bail',
+                'required_with:auctionData.endBlock',
                 new MinBigInt(),
                 new MaxBigInt(Hex::MAX_UINT32),
-                'gt:auctionData.startBlock',
+                'lte:auctionData.endBlock',
             ],
         ];
     }

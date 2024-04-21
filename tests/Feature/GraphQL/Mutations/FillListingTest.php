@@ -31,6 +31,18 @@ class FillListingTest extends TestCaseGraphQL
         );
     }
 
+    public function test_it_can_skip_validation(): void
+    {
+        $response = $this->graphql(
+            $this->method,
+            $params = ['listingId' => '0x' . fake()->regexify('[a-f0-9]{64}'), 'amount' => fake()->numberBetween(1, 1000), 'skipValidation' => true]
+        );
+        $this->assertEquals(
+            $response['encodedData'],
+            TransactionSerializer::encode($this->method, FillListingMutation::getEncodableParams(...$params))
+        );
+    }
+
     public function test_it_will_fail_with_invalid_parameter_listing_id(): void
     {
         $listing = $this->createListing();

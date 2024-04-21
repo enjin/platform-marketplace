@@ -1,5 +1,5 @@
-mutation CancelListing($listingId: String!) {
-  CancelListing(listingId: $listingId) {
+mutation CancelListing($listingId: String!, $skipValidation: Boolean) {
+  CancelListing(listingId: $listingId, skipValidation: $skipValidation) {
     id
     transactionId
     transactionHash
