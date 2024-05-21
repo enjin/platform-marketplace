@@ -24,12 +24,12 @@ return new class () extends Migration {
      */
     public function down(): void
     {
-        Schema::table('marketplace_sales', function (Blueprint $table) {
-            $table->dropColumn('listing_id');
-        });
-
         Schema::table('marketplace_listings', function (Blueprint $table) {
             $table->renameColumn('listing_chain_id', 'listing_id');
+        });
+
+        Schema::table('marketplace_sales', function (Blueprint $table) {
+            $table->dropColumn('listing_chain_id');
         });
     }
 };
