@@ -28,7 +28,7 @@ class ListingCreated extends MarketplaceSubstrateEvent
             return;
         }
 
-        if (!$this->shouldIndexCollection(Arr::get($event->makeAssetId, 'collection_id')) && !$this->shouldIndexCollection(Arr::get($event->takeAssetId, 'collection_id'))) {
+        if (!$this->shouldSyncCollection(Arr::get($event->makeAssetId, 'collection_id')) && !$this->shouldSyncCollection(Arr::get($event->takeAssetId, 'collection_id'))) {
             return;
         }
 
