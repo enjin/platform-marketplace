@@ -5,70 +5,79 @@ namespace Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Impleme
 use Carbon\Carbon;
 use Enjin\Platform\Marketplace\Enums\ListingState;
 use Enjin\Platform\Marketplace\Events\Substrate\Marketplace\AuctionFinalized as AuctionFinalizedEvent;
+use Enjin\Platform\Marketplace\Models\Laravel\Wallet;
 use Enjin\Platform\Marketplace\Models\MarketplaceSale;
 use Enjin\Platform\Marketplace\Models\MarketplaceState;
 use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\MarketplaceSubstrateEvent;
-use Enjin\Platform\Models\Laravel\Block;
-use Enjin\Platform\Services\Processor\Substrate\Codec\Codec;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\AuctionFinalized as AuctionFinalizedPolkadart;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Event;
 use Illuminate\Support\Facades\Log;
 
 class AuctionFinalized extends MarketplaceSubstrateEvent
 {
+    /** @var AuctionFinalizedPolkadart */
+    protected Event $event;
+
     /**
      * Handles the auction finalized event.
      */
-    public function run(Event $event, Block $block, Codec $codec): void
+    public function run(): void
     {
-        if (!$event instanceof AuctionFinalizedPolkadart) {
-            return;
-        }
-
         try {
-            $listing = $this->getListing($event->listingId);
-            $bidder = $this->firstOrStoreAccount($event->winningBidder);
+            // Fails if the listing is not found
+            $listing = $this->getListing($this->event->listingId);
+            $bidder = $this->firstOrStoreAccount($this->event->winningBidder);
+            $seller = Wallet::find($listing->seller_wallet_id);
 
-            $state = MarketplaceState::create([
+            MarketplaceState::create([
                 'marketplace_listing_id' => $listing->id,
                 'state' => ListingState::FINALIZED->name,
-                'height' => $block->number,
+                'height' => $this->block->number,
                 'created_at' => $now = Carbon::now(),
                 'updated_at' => $now,
             ]);
 
-            $sale = MarketplaceSale::create([
+            MarketplaceSale::create([
                 'listing_chain_id' => $listing->listing_chain_id,
                 'wallet_id' => $bidder->id,
-                'price' => $event->price,
+                'price' => $this->event->price,
                 'amount' => $listing->amount,
             ]);
 
-            Log::info(
-                sprintf(
-                    'Listing %s (id: %s) was finalized (id: %s) with a sale (id: %s) from %s (id: %s).',
-                    $event->listingId,
-                    $listing->id,
-                    $state->id,
-                    $sale->id,
-                    $event->winningBidder,
-                    $bidder->id,
-                )
-            );
-
-            AuctionFinalizedEvent::safeBroadcast(
-                $listing,
-                $state,
-                $sale,
-                $this->getTransaction($block, $event->extrinsicIndex),
-            );
-        } catch (\Throwable $e) {
+            $this->extra = [
+                'collection_id' => $listing->make_collection_chain_id,
+                'token_id' => $listing->make_token_chain_id,
+                'bidder' => $bidder->public_key,
+                'seller' => $seller->public_key,
+            ];
+        } catch (\Throwable) {
             Log::error(
                 sprintf(
                     'Listing %s was finalized but could not be found in the database.',
-                    $event->listingId,
+                    $this->event->listingId,
                 )
             );
         }
+    }
+
+    public function log(): void
+    {
+        Log::debug(
+            sprintf(
+                'Listing %s was finalized with a sale from %s.',
+                $this->event->listingId,
+                $this->event->winningBidder,
+            )
+        );
+
+    }
+
+    public function broadcast(): void
+    {
+        AuctionFinalizedEvent::safeBroadcast(
+            $this->event,
+            $this->getTransaction($this->block, $this->event->extrinsicIndex),
+            $this->extra,
+        );
     }
 }
