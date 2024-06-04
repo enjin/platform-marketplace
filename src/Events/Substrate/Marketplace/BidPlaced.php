@@ -6,41 +6,27 @@ use Enjin\Platform\Channels\PlatformAppChannel;
 use Enjin\Platform\Events\PlatformBroadcastEvent;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Database\Eloquent\Model;
+use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\BidPlaced as BidPlacedPolkadart;
 
 class BidPlaced extends PlatformBroadcastEvent
 {
     /**
      * Create a new event instance.
      */
-    public function __construct(Model $listing, Model $bid, ?Model $transaction = null)
+    public function __construct(BidPlacedPolkadart $event, ?Model $transaction = null, ?array $extra = null)
     {
         parent::__construct();
 
-        $this->model = $bid;
-
-        $this->broadcastData = [
+        $this->broadcastData = $event->toBroadcast([
             'idempotencyKey' => $transaction?->idempotency_key,
-            'listingId' => $listing->listing_chain_id,
-            'seller' => $listing->seller->address,
-            'makeAssetId' => [
-                'collectionId' => $listing->make_collection_chain_id,
-                'tokenId' => $listing->make_token_chain_id,
-            ],
-            'takeAssetId' => [
-                'collectionId' => $listing->take_collection_chain_id,
-                'tokenId' => $listing->take_token_chain_id,
-            ],
-            'bidder' => $bid->bidder->address,
-            'price' => $bid->price,
-            'height' => $bid->height,
-        ];
+        ]);
 
         $this->broadcastChannels = [
-            new Channel("listing;{$this->broadcastData['listingId']}"),
-            new Channel($this->broadcastData['seller']),
-            new Channel($this->broadcastData['bidder']),
-            new Channel("collection;{$this->broadcastData['makeAssetId']['collectionId']}"),
-            new Channel("token;{$this->broadcastData['makeAssetId']['tokenId']}"),
+            new Channel("listing;{$event->listingId}"),
+            new Channel("collection;{$extra['collection_id']}"),
+            new Channel("token;{$extra['collection_id']}-{$extra['token_id']}"),
+            new Channel($event->bidder),
+            new Channel($extra['seller']),
             new PlatformAppChannel(),
         ];
     }
