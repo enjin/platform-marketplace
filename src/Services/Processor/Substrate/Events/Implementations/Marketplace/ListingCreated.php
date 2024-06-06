@@ -20,6 +20,8 @@ class ListingCreated extends MarketplaceSubstrateEvent
     /** @var ListingCreatedPolkadart */
     protected Event $event;
 
+    protected MarketplaceListing $listingCreated;
+
     /**
      * Handles the listing created event.
      */
@@ -31,7 +33,7 @@ class ListingCreated extends MarketplaceSubstrateEvent
             return;
         }
         $seller = $this->firstOrStoreAccount($this->event->seller);
-        $listing = MarketplaceListing::updateOrCreate([
+        $this->listingCreated = MarketplaceListing::updateOrCreate([
             'listing_chain_id' => $this->event->listingId,
         ], [
             'seller_wallet_id' => $seller->id,
@@ -55,7 +57,7 @@ class ListingCreated extends MarketplaceSubstrateEvent
         ]);
 
         MarketplaceState::create([
-            'marketplace_listing_id' => $listing->id,
+            'marketplace_listing_id' => $this->listingCreated->id,
             'state' => ListingState::ACTIVE->name,
             'height' => $this->event->creationBlock,
             'created_at' => $now = Carbon::now(),
@@ -63,8 +65,8 @@ class ListingCreated extends MarketplaceSubstrateEvent
         ]);
 
         $this->extra = [
-            'collection_id' => $listing->make_collection_chain_id,
-            'token_id' => $listing->make_token_chain_id,
+            'collection_id' => $this->listingCreated->make_collection_chain_id,
+            'token_id' => $this->listingCreated->make_token_chain_id,
             'seller' => $seller->public_key,
         ];
     }
@@ -85,6 +87,7 @@ class ListingCreated extends MarketplaceSubstrateEvent
             $this->event,
             $this->getTransaction($this->block, $this->event->extrinsicIndex),
             $this->extra,
+            $this->listingCreated,
         );
     }
 }

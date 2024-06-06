@@ -16,6 +16,8 @@ class BidPlaced extends MarketplaceSubstrateEvent
     /** @var BidPlacedPolkadart */
     protected Event $event;
 
+    protected MarketplaceBid $bidCreated;
+
     /**
      * Handles the bid placed event.
      */
@@ -27,7 +29,7 @@ class BidPlaced extends MarketplaceSubstrateEvent
             $bidder = $this->firstOrStoreAccount($this->event->bidder);
             $seller = Wallet::find($listing->seller_wallet_id);
 
-            MarketplaceBid::create([
+            $this->bidCreated = MarketplaceBid::create([
                 'marketplace_listing_id' => $listing->id,
                 'wallet_id' => $bidder->id,
                 'price' => $this->event->price,
@@ -68,6 +70,7 @@ class BidPlaced extends MarketplaceSubstrateEvent
             $this->event,
             $this->getTransaction($this->block, $this->event->extrinsicIndex),
             $this->extra,
+            $this->bidCreated,
         );
     }
 }
