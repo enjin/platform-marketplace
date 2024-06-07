@@ -18,7 +18,7 @@ class AuctionFinalized extends MarketplaceSubstrateEvent
     /** @var AuctionFinalizedPolkadart */
     protected Event $event;
 
-    protected MarketplaceSale $saleCreated;
+    protected ?MarketplaceSale $saleCreated = null;
 
     /**
      * Handles the auction finalized event.
