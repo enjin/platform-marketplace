@@ -20,7 +20,7 @@ class ListingCreated extends MarketplaceSubstrateEvent
     /** @var ListingCreatedPolkadart */
     protected Event $event;
 
-    protected MarketplaceListing $listingCreated;
+    protected ?MarketplaceListing $listingCreated = null;
 
     /**
      * Handles the listing created event.
