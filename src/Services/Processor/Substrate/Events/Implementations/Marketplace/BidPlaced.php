@@ -16,7 +16,7 @@ class BidPlaced extends MarketplaceSubstrateEvent
     /** @var BidPlacedPolkadart */
     protected Event $event;
 
-    protected ?MarketplaceBid $bidCreated = null;
+    protected MarketplaceBid $bidCreated;
 
     /**
      * Handles the bid placed event.
