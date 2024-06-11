@@ -23,14 +23,14 @@ enum MarketplaceEventType: string
     /**
      * Get the processor for the event.
      */
-    public function getProcessor($event, $block, $codec): SubstrateEvent
+    public function getProcessor(): SubstrateEvent
     {
         return match ($this) {
-            self::AUCTION_FINALIZED => new AuctionFinalized($event, $block, $codec),
-            self::BID_PLACED => new BidPlaced($event, $block, $codec),
-            self::LISTING_CANCELLED => new ListingCancelled($event, $block, $codec),
-            self::LISTING_CREATED => new ListingCreated($event, $block, $codec),
-            self::LISTING_FILLED => new ListingFilled($event, $block, $codec),
+            self::AUCTION_FINALIZED => new AuctionFinalized(),
+            self::BID_PLACED => new BidPlaced(),
+            self::LISTING_CANCELLED => new ListingCancelled(),
+            self::LISTING_CREATED => new ListingCreated(),
+            self::LISTING_FILLED => new ListingFilled(),
         };
     }
 }
