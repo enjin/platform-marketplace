@@ -10,6 +10,8 @@ use Enjin\Platform\Marketplace\Events\Substrate\Marketplace\ListingCreated as Li
 use Enjin\Platform\Marketplace\Models\MarketplaceListing;
 use Enjin\Platform\Marketplace\Models\MarketplaceState;
 use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\MarketplaceSubstrateEvent;
+use Enjin\Platform\Models\Laravel\Block;
+use Enjin\Platform\Services\Processor\Substrate\Codec\Codec;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\ListingCreated as ListingCreatedPolkadart;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Event;
 use Illuminate\Support\Arr;
@@ -17,74 +19,63 @@ use Illuminate\Support\Facades\Log;
 
 class ListingCreated extends MarketplaceSubstrateEvent
 {
-    /** @var ListingCreatedPolkadart */
-    protected Event $event;
-
     /**
      * Handles the listing created event.
      */
-    public function run(): void
+    public function run(Event $event, Block $block, Codec $codec): void
     {
-        if (!$this->shouldSyncCollection(Arr::get($this->event->makeAssetId, 'collection_id'))
-            && !$this->shouldSyncCollection(Arr::get($this->event->takeAssetId, 'collection_id'))
-        ) {
+        if (!$event instanceof ListingCreatedPolkadart) {
             return;
         }
-        $seller = $this->firstOrStoreAccount($this->event->seller);
+
+        if (!$this->shouldSyncCollection(Arr::get($event->makeAssetId, 'collection_id')) && !$this->shouldSyncCollection(Arr::get($event->takeAssetId, 'collection_id'))) {
+            return;
+        }
+
+        $seller = $this->firstOrStoreAccount($event->seller);
         $listing = MarketplaceListing::updateOrCreate([
-            'listing_chain_id' => $this->event->listingId,
+            'listing_chain_id' => $event->listingId,
         ], [
             'seller_wallet_id' => $seller->id,
-            'make_collection_chain_id' => Arr::get($this->event->makeAssetId, 'collection_id'),
-            'make_token_chain_id' => Arr::get($this->event->makeAssetId, 'token_id'),
-            'take_collection_chain_id' => Arr::get($this->event->takeAssetId, 'collection_id'),
-            'take_token_chain_id' => Arr::get($this->event->takeAssetId, 'token_id'),
-            'amount' => $this->event->amount,
-            'price' => $this->event->price,
-            'min_take_value' => $this->event->minTakeValue,
-            'fee_side' => FeeSide::tryFrom($this->event->feeSide)?->name,
-            'creation_block' => $this->event->creationBlock,
-            'deposit' => $this->event->deposit,
-            'salt' => $this->event->salt,
-            'type' => ListingType::from(array_key_first($this->event->state))->name,
-            'start_block' => Arr::get($this->event->data, 'Auction.start_block'),
-            'end_block' => Arr::get($this->event->data, 'Auction.end_block'),
-            'amount_filled' => $this->getValue($this->event->state, ['FixedPrice.amount_filled', 'FixedPrice']),
+            'make_collection_chain_id' => Arr::get($event->makeAssetId, 'collection_id'),
+            'make_token_chain_id' => Arr::get($event->makeAssetId, 'token_id'),
+            'take_collection_chain_id' => Arr::get($event->takeAssetId, 'collection_id'),
+            'take_token_chain_id' => Arr::get($event->takeAssetId, 'token_id'),
+            'amount' => $event->amount,
+            'price' => $event->price,
+            'min_take_value' => $event->minTakeValue,
+            'fee_side' => FeeSide::tryFrom($event->feeSide)?->name,
+            'creation_block' => $event->creationBlock,
+            'deposit' => $event->deposit,
+            'salt' => $event->salt,
+            'type' => ListingType::from(array_key_first($event->state))->name,
+            'start_block' => Arr::get($event->data, 'Auction.start_block'),
+            'end_block' => Arr::get($event->data, 'Auction.end_block'),
+            'amount_filled' => $this->getValue($event->state, ['FixedPrice.amount_filled', 'FixedPrice']),
             'created_at' => $now = Carbon::now(),
             'updated_at' => $now,
         ]);
 
-        MarketplaceState::create([
+        $state = MarketplaceState::create([
             'marketplace_listing_id' => $listing->id,
             'state' => ListingState::ACTIVE->name,
-            'height' => $this->event->creationBlock,
+            'height' => $event->creationBlock,
             'created_at' => $now = Carbon::now(),
             'updated_at' => $now,
         ]);
 
-        $this->extra = [
-            'collection_id' => $listing->make_collection_chain_id,
-            'token_id' => $listing->make_token_chain_id,
-            'seller' => $seller->public_key,
-        ];
-    }
-
-    public function log(): void
-    {
-        Log::debug(
+        Log::info(
             sprintf(
-                'Listing %s was created.',
-                $this->event->listingId,
+                'Listing %s (id: %s) was created.',
+                $event->listingId,
+                $listing->id,
             )
         );
-    }
 
-    public function broadcast(): void
-    {
         ListingCreatedEvent::safeBroadcast(
-            $this->event,
-            $this->getTransaction($this->block, $this->event->extrinsicIndex),
-            $this->extra,
+            $listing,
+            $state,
+            $this->getTransaction($block, $event->extrinsicIndex),
         );
     }
 }
