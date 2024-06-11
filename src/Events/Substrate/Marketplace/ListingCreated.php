@@ -13,11 +13,9 @@ class ListingCreated extends PlatformBroadcastEvent
     /**
      * Create a new event instance.
      */
-    public function __construct(ListingCreatedPolkadart $event, ?Model $transaction = null, ?array $extra = null, ?Model $listing = null)
+    public function __construct(ListingCreatedPolkadart $event, ?Model $transaction = null, ?array $extra = null)
     {
         parent::__construct();
-
-        $this->model = $listing;
 
         $this->broadcastData = $event->toBroadcast([
             'idempotencyKey' => $transaction?->idempotency_key,

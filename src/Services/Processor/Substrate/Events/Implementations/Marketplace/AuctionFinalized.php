@@ -18,8 +18,6 @@ class AuctionFinalized extends MarketplaceSubstrateEvent
     /** @var AuctionFinalizedPolkadart */
     protected Event $event;
 
-    protected MarketplaceSale $saleCreated;
-
     /**
      * Handles the auction finalized event.
      */
@@ -39,7 +37,7 @@ class AuctionFinalized extends MarketplaceSubstrateEvent
                 'updated_at' => $now,
             ]);
 
-            $this->saleCreated = MarketplaceSale::create([
+            MarketplaceSale::create([
                 'listing_chain_id' => $listing->listing_chain_id,
                 'wallet_id' => $bidder->id,
                 'price' => $this->event->price,
@@ -80,7 +78,6 @@ class AuctionFinalized extends MarketplaceSubstrateEvent
             $this->event,
             $this->getTransaction($this->block, $this->event->extrinsicIndex),
             $this->extra,
-            $this->saleCreated,
         );
     }
 }

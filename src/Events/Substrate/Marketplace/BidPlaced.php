@@ -13,11 +13,9 @@ class BidPlaced extends PlatformBroadcastEvent
     /**
      * Create a new event instance.
      */
-    public function __construct(BidPlacedPolkadart $event, ?Model $transaction = null, ?array $extra = null, ?Model $bid = null)
+    public function __construct(BidPlacedPolkadart $event, ?Model $transaction = null, ?array $extra = null)
     {
         parent::__construct();
-
-        $this->model = $bid;
 
         $this->broadcastData = $event->toBroadcast([
             'idempotencyKey' => $transaction?->idempotency_key,

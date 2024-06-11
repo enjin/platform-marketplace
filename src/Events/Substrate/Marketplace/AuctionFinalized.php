@@ -13,11 +13,9 @@ class AuctionFinalized extends PlatformBroadcastEvent
     /**
      * Create a new event instance.
      */
-    public function __construct(AuctionFinalizedPolkadart $event, ?Model $transaction = null, ?array $extra = null, ?Model $sale = null)
+    public function __construct(AuctionFinalizedPolkadart $event, ?Model $transaction = null, ?array $extra = null)
     {
         parent::__construct();
-
-        $this->model = $sale;
 
         $this->broadcastData = $event->toBroadcast([
             'idempotencyKey' => $transaction?->idempotency_key,
