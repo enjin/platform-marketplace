@@ -44,7 +44,7 @@ class MarketplaceSaleType extends Type
                 'is_relation' => true,
             ],
             'listing' => [
-                'type' => GraphQL::type('MarketplaceListing!'),
+                'type' => GraphQL::type('MarketplaceListing'),
                 'description' => __('enjin-platform-marketplace::type.marketplace_listing.description'),
                 'is_relation' => true,
             ],
