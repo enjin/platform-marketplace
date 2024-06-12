@@ -21,6 +21,9 @@ class MarketplaceServiceProvider extends PackageServiceProvider
             ->hasMigration('create_marketplace_bids_table')
             ->hasMigration('create_marketplace_sales_table')
             ->hasMigration('create_marketplace_states_table')
+            ->hasMigration('add_listing_id_to_marketplace_sales_table')
+            ->hasMigration('drop_market_place_listing_id_in_marketplace_sales_table')
+            ->hasMigration('nullable_listing_on_marketplace_sales_table')
             ->hasTranslations();
     }
 
