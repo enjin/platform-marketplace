@@ -8,9 +8,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 class ListingExists implements ValidationRule
 {
-    public function __construct(protected string $column = 'listing_chain_id')
-    {
-    }
+    public function __construct(protected string $column = 'listing_chain_id') {}
 
     /**
      * Run the validation rule.

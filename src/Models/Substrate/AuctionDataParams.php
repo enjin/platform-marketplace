@@ -10,8 +10,7 @@ class AuctionDataParams
     public function __construct(
         public int $startBlock,
         public int $endBlock
-    ) {
-    }
+    ) {}
 
     /**
      * Convert the object to encodable formatted array.

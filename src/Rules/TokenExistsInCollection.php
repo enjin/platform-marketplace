@@ -14,9 +14,7 @@ class TokenExistsInCollection implements ValidationRule
     /**
      * Create a new rule instance.
      */
-    public function __construct(protected ?string $collectionId)
-    {
-    }
+    public function __construct(protected ?string $collectionId) {}
 
     /**
      * Run the validation rule.
