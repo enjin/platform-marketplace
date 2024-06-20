@@ -8,11 +8,9 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Staudenmeir\EloquentEagerLimit\HasEagerLimit;
 
 class MarketplaceListing extends BaseModel
 {
-    use HasEagerLimit;
     use HasFactory;
     use Traits\EagerLoadSelectFields;
 

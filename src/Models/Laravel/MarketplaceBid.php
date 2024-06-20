@@ -7,11 +7,9 @@ use Enjin\Platform\Models\BaseModel;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Staudenmeir\EloquentEagerLimit\HasEagerLimit;
 
 class MarketplaceBid extends BaseModel
 {
-    use HasEagerLimit;
     use HasFactory;
     use Traits\EagerLoadSelectFields;
 

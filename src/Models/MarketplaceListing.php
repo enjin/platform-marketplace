@@ -4,6 +4,4 @@ namespace Enjin\Platform\Marketplace\Models;
 
 use Enjin\Platform\Models\ModelResolver;
 
-class MarketplaceListing extends ModelResolver
-{
-}
+class MarketplaceListing extends ModelResolver {}
