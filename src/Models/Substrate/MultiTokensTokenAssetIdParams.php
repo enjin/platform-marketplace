@@ -12,8 +12,7 @@ class MultiTokensTokenAssetIdParams
     public function __construct(
         public string $collectionId,
         public string $tokenId
-    ) {
-    }
+    ) {}
 
     public static function fromEncodable(array $data): self
     {
