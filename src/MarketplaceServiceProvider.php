@@ -2,7 +2,7 @@
 
 namespace Enjin\Platform\Marketplace;
 
-use Enjin\Platform\Facades\Package as EnjinPackage;
+use Enjin\Platform\Marketplace\Package as MarketplacePackage;
 use Enjin\Platform\Marketplace\Services\Processor\Substrate\Codec\Encoder as MarketplaceEncoder;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Encoder as BaseEncoder;
 use Spatie\LaravelPackageTools\Package;
@@ -36,7 +36,7 @@ class MarketplaceServiceProvider extends PackageServiceProvider
     public function register()
     {
         if (app()->runningUnitTests()) {
-            EnjinPackage::setPath(__DIR__ . '/..');
+            MarketplacePackage::setPath(__DIR__ . '/..');
         }
 
         parent::register();
