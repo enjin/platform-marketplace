@@ -2,20 +2,10 @@
 
 namespace Enjin\Platform\Marketplace;
 
-class Package
-{
-    /**
-     * Get the composer autoloader for auto-bootstrapping services.
-     */
-    public static function getAutoloader(): string
-    {
-        // TODO: It doesn't work on a real laravel env if using the below
-        // $loader = require realpath(__DIR__ . 'vendor/autoload.php');
-        // TODO: If using the below it doesn't work on testbench, neither composer will install
-        // $loader = require app()->basePath('../../../autoload.php')
-        return app()->runningUnitTests() ? require app()->basePath('../../../autoload.php') : require app()->basePath('vendor/autoload.php');
-    }
+use Enjin\Platform\Package as CorePackage;
 
+class Package extends CorePackage
+{
     /**
      * Get any routes that have been set up for this package.
      */
