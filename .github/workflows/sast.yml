@@ -2,11 +2,9 @@ name: Static Application Security Testing
 
 on:
   pull_request:
-    paths-ignore:
-      - "**.md"
   push:
     paths-ignore:
-      - '**.md'
+      - "**.md"
 
 jobs:
   test:
