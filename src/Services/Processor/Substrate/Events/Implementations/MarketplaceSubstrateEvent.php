@@ -17,7 +17,7 @@ abstract class MarketplaceSubstrateEvent extends SubstrateEvent
     protected function getListing(string $listingId): Model
     {
         if (!$listing = MarketplaceListing::where(['listing_chain_id' => $listingId])->first()) {
-            throw new PlatformException(__('enjin-platform::traits.query_data_or_fail.unable_to_find_listing', ['class' => __CLASS__, 'listingId' => $listingId]));
+            throw new PlatformException(__('enjin-platform::traits.query_data_or_fail.unable_to_find_listing', ['class' => self::class, 'listingId' => $listingId]));
         }
 
         return $listing;

@@ -19,7 +19,7 @@
         }
     ],
     "require": {
-        "php": "^8.2",
+        "php": "^8.2|^8.3",
         "ext-bcmath": "*",
         "ext-json": "*",
         "ext-openssl": "*",
@@ -41,6 +41,7 @@
         "phpstan/phpstan-phpunit": "^1.0",
         "phpunit/php-code-coverage": "^10.0",
         "phpunit/phpunit": "^10.0",
+        "rector/rector": "^1.0",
         "roave/security-advisories": "dev-latest"
     },
     "autoload": {
@@ -60,7 +61,8 @@
     "scripts": {
         "build-sr25519": "cd vendor/gmajor/sr25519-bindings/go && go build -buildmode=c-shared -o sr25519.so . && mv sr25519.so ../src/Crypto/sr25519.so",
         "analyse": "vendor/bin/phpstan analyse",
-        "fix": "vendor/bin/pint",
+        "dry-fix": "vendor/bin/rector process --dry-run && vendor/bin/pint --test --config ./pint.json",
+        "fix": "vendor/bin/rector process && vendor/bin/pint --config ./pint.json",
         "test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage-html ../../temp/coverage",
         "post-autoload-dump": [
