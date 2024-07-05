@@ -29,41 +29,30 @@ trait EagerLoadSelectFields
         static::$query = $query;
         $queryPlan = $resolveInfo->lookAhead()->queryPlan();
 
-        switch ($query) {
-            case 'GetListings':
-            case 'GetListing':
-                [$select, $with, $withCount] = static::loadListings(
-                    $queryPlan,
-                    $query == 'GetListings' ? 'edges.fields.node.fields' : '',
-                    [],
-                    null,
-                    true
-                );
-
-                break;
-            case 'GetBids':
-            case 'GetBid':
-                [$select, $with, $withCount] = static::loadBids(
-                    $queryPlan,
-                    $query == 'GetBids' ? 'edges.fields.node.fields' : '',
-                    [],
-                    null,
-                    true
-                );
-
-                break;
-            case 'GetSales':
-            case 'GetSale':
-                [$select, $with, $withCount] = static::loadSales(
-                    $queryPlan,
-                    $query == 'GetSales' ? 'edges.fields.node.fields' : '',
-                    [],
-                    null,
-                    true
-                );
-
-                break;
-        }
+        [$select, $with, $withCount] = match ($query) {
+            'GetListings', 'GetListing' => static::loadListings(
+                $queryPlan,
+                $query == 'GetListings' ? 'edges.fields.node.fields' : '',
+                [],
+                null,
+                true
+            ),
+            'GetBids', 'GetBid' => static::loadBids(
+                $queryPlan,
+                $query == 'GetBids' ? 'edges.fields.node.fields' : '',
+                [],
+                null,
+                true
+            ),
+            'GetSales', 'GetSale' => static::loadSales(
+                $queryPlan,
+                $query == 'GetSales' ? 'edges.fields.node.fields' : '',
+                [],
+                null,
+                true
+            ),
+            default => [$select, $with, $withCount],
+        };
 
 
         return [$select, $with, $withCount];
@@ -97,7 +86,7 @@ trait EagerLoadSelectFields
 
         if (!$isParent) {
             $with = [
-                $key => function ($query) use ($select, $args) {
+                $key => function ($query) use ($select, $args): void {
                     $query->select(array_unique($select))
                         ->when($cursor = Cursor::fromEncoded(Arr::get($args, 'after')), fn ($q) => $q->where('id', '>', $cursor->parameter('id')))
                         ->orderBy('marketplace_listings.id');
@@ -155,7 +144,7 @@ trait EagerLoadSelectFields
 
         if (!$isParent) {
             $with = [
-                $key => function ($query) use ($select, $args) {
+                $key => function ($query) use ($select, $args): void {
                     $query->select(array_unique($select))
                         ->when($cursor = Cursor::fromEncoded(Arr::get($args, 'after')), fn ($q) => $q->where('id', '>', $cursor->parameter('id')))
                         ->orderBy('marketplace_bids.id');
@@ -206,7 +195,7 @@ trait EagerLoadSelectFields
 
         if (!$isParent) {
             $with = [
-                $key => function ($query) use ($select, $args) {
+                $key => function ($query) use ($select, $args): void {
                     $query->select(array_unique($select))
                         ->when($cursor = Cursor::fromEncoded(Arr::get($args, 'after')), fn ($q) => $q->where('id', '>', $cursor->parameter('id')))
                         ->orderBy('marketplace_sales.id');
