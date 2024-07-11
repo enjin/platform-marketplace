@@ -42,12 +42,10 @@ class MarketplaceListingType extends Type
             'makeAssetId' => [
                 'type' => GraphQL::type('Asset!'),
                 'description' => __('enjin-platform-marketplace::type.marketplace_listing.field.makeAssetId'),
-                'resolve' => function ($listing) {
-                    return [
-                        'collectionId' => $listing->make_collection_chain_id,
-                        'tokenId' => $listing->make_token_chain_id,
-                    ];
-                },
+                'resolve' => fn ($listing) => [
+                    'collectionId' => $listing->make_collection_chain_id,
+                    'tokenId' => $listing->make_token_chain_id,
+                ],
                 'is_relation' => false,
                 'selectable' => false,
                 'always' => ['make_collection_chain_id', 'make_token_chain_id'],
@@ -55,12 +53,10 @@ class MarketplaceListingType extends Type
             'takeAssetId' => [
                 'type' => GraphQL::type('Asset!'),
                 'description' => __('enjin-platform-marketplace::type.marketplace_listing.field.takeAssetId'),
-                'resolve' => function ($listing) {
-                    return [
-                        'collectionId' => $listing->take_collection_chain_id,
-                        'tokenId' => $listing->take_token_chain_id,
-                    ];
-                },
+                'resolve' => fn ($listing) => [
+                    'collectionId' => $listing->take_collection_chain_id,
+                    'tokenId' => $listing->take_token_chain_id,
+                ],
                 'is_relation' => false,
                 'selectable' => false,
                 'always' => ['take_collection_chain_id', 'take_token_chain_id'],
@@ -120,34 +116,30 @@ class MarketplaceListingType extends Type
                 'description' => __('enjin-platform-marketplace::type.marketplace_sale.description'),
                 'args' => ConnectionInput::args(),
                 'is_relation' => true,
-                'resolve' => function ($listing, $args) {
-                    return [
-                        'items' => new CursorPaginator(
-                            $listing?->sales,
-                            $args['first'],
-                            Arr::get($args, 'after') ? Cursor::fromEncoded($args['after']) : null,
-                            ['parameters' => ['id']]
-                        ),
-                        'total' => (int) $listing?->sales_count,
-                    ];
-                },
+                'resolve' => fn ($listing, $args) => [
+                    'items' => new CursorPaginator(
+                        $listing?->sales,
+                        $args['first'],
+                        Arr::get($args, 'after') ? Cursor::fromEncoded($args['after']) : null,
+                        ['parameters' => ['id']]
+                    ),
+                    'total' => (int) $listing?->sales_count,
+                ],
             ],
             'bids' => [
                 'type' => GraphQL::paginate('MarketplaceBid', 'MarketplaceBidConnection'),
                 'description' => __('enjin-platform-marketplace::type.marketplace_bid.description'),
                 'args' => ConnectionInput::args(),
                 'is_relation' => true,
-                'resolve' => function ($listing, $args) {
-                    return [
-                        'items' => new CursorPaginator(
-                            $listing?->bids,
-                            $args['first'],
-                            Arr::get($args, 'after') ? Cursor::fromEncoded($args['after']) : null,
-                            ['parameters' => ['id']]
-                        ),
-                        'total' => (int) $listing?->bids_count,
-                    ];
-                },
+                'resolve' => fn ($listing, $args) => [
+                    'items' => new CursorPaginator(
+                        $listing?->bids,
+                        $args['first'],
+                        Arr::get($args, 'after') ? Cursor::fromEncoded($args['after']) : null,
+                        ['parameters' => ['id']]
+                    ),
+                    'total' => (int) $listing?->bids_count,
+                ],
             ],
             'states' => [
                 'type' => GraphQL::type('[MarketplaceState!]'),

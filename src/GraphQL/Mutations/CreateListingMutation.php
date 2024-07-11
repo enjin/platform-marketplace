@@ -85,6 +85,11 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 'type' => GraphQL::type('String'),
                 'description' => __('enjin-platform-marketplace::type.marketplace_listing.field.salt'),
             ],
+            // TODO: We should remove `auctionData` and replace it with `listingData`
+            //  listingData = FixedPrice, Auction, Offer
+            //      FixedPrice => null,
+            //      Auction => { startBlock, endBlock },
+            //      Offer => { expiration }
             'auctionData' => [
                 'type' => GraphQL::type('AuctionDataInputType'),
                 'description' => __('enjin-platform-marketplace::input_type.auction_data.description'),
@@ -106,7 +111,8 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         ResolveInfo $resolveInfo,
         Closure $getSelectFields,
     ) {
-        $encodedData = TransactionSerializer::encode($this->getMutationName(), static::getEncodableParams(
+        $method = isRunningLatest() ? $this->getMutationName() . 'V1010' : $this->getMutationName();
+        $encodedData = TransactionSerializer::encode($method, static::getEncodableParams(
             makeAssetId: new MultiTokensTokenAssetIdParams(
                 Arr::get($args, 'makeAssetId.collectionId'),
                 $this->encodeTokenId(Arr::get($args, 'makeAssetId'))
@@ -136,7 +142,17 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         $amount = Arr::get($params, 'amount', 0);
         $price = Arr::get($params, 'price', 0);
         $salt = Arr::get($params, 'salt', Str::random(10));
-        $auctionData = Arr::get($params, 'auctionData', null);
+        $auctionData = Arr::get($params, 'auctionData');
+
+        $extra = isRunningLatest() ? [
+            'listingData' => $auctionData ? [
+                'Auction' => $auctionData->toEncodable(),
+            ] : [
+                'FixedPrice' => null,
+            ],
+        ] : [
+            'auctionData' => $auctionData?->toEncodable(),
+        ];
 
         return [
             'makeAssetId' => $makeAsset->toEncodable(),
@@ -144,7 +160,8 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
             'amount' => gmp_init($amount),
             'price' => gmp_init($price),
             'salt' => HexConverter::stringToHexPrefixed($salt),
-            'auctionData' => $auctionData?->toEncodable(),
+            ...$extra,
+            'depositor' => null,
         ];
     }
 
@@ -158,7 +175,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 'required_with:' . $makeOrTake . '.tokenId',
                 new MinBigInt(),
                 new MaxBigInt(Hex::MAX_UINT128),
-                function (string $attribute, mixed $value, Closure $fail) {
+                function (string $attribute, mixed $value, Closure $fail): void {
                     if (!Collection::where('collection_chain_id', $value)->exists()) {
                         $fail('validation.exists')->translate();
                     }

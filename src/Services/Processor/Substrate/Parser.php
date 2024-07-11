@@ -15,17 +15,14 @@ use Illuminate\Support\Arr;
 class Parser extends BaseParser
 {
     protected static $listingCache = [];
-    protected MarketplaceService $marketplaceService;
     protected Codec $codec;
 
     /**
      * Creates the parser instance.
      */
-    public function __construct(MarketplaceService $marketplaceService)
+    public function __construct(protected MarketplaceService $marketplaceService)
     {
         parent::__construct();
-
-        $this->marketplaceService = $marketplaceService;
         $this->codec = new Codec();
     }
 

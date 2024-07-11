@@ -152,7 +152,7 @@ class TestCaseGraphQL extends BaseTestCase
             $this->seedRelatedData($listing, $state);
         } else {
             $listing->each(
-                function (MarketplaceListing $listing) use ($state) {
+                function (MarketplaceListing $listing) use ($state): void {
                     $this->seedRelatedData($listing, $state);
                 }
             );
