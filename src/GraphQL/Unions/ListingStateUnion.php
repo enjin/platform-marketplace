@@ -17,7 +17,7 @@ class ListingStateUnion extends UnionType implements PlatformGraphQlUnion
     {
         return [
             'name' => 'ListingState',
-            'description' => __('enjin-platform-marketplace::union.listing_state.description'),
+            'description' => __('enjin-platform-marketplace::enum.listing_state.description'),
         ];
     }
 
