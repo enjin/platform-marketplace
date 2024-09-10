@@ -28,7 +28,11 @@ class Decoder extends BaseDecoder
      */
     public function listingStorageData(string $data): array
     {
-        $decoded = $this->codec->process(isRunningLatest() ? 'ListingStorageDataV1010' : 'ListingStorageData', new ScaleBytes($data));
+        try {
+            $decoded = $this->codec->process('ListingStorageDataV1010', new ScaleBytes($data));
+        } catch (\Exception) {
+            $decoded = $this->codec->process('ListingStorageData', new ScaleBytes($data));
+        }
 
         return [
             'seller' => ($seller = $this->getValue($decoded, ['seller', 'creator'])) !== null ? HexConverter::prefix($seller) : null,
