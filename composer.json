@@ -28,7 +28,7 @@
         "rebing/graphql-laravel": "^9.2",
         "spatie/laravel-package-tools": "^1.0",
         "spatie/laravel-ray": "^1.0",
-        "phrity/websocket": "^1.0"
+        "phrity/websocket": "^3.2"
     },
     "require-dev": {
         "dms/phpunit-arraysubset-asserts": "dev-master",
