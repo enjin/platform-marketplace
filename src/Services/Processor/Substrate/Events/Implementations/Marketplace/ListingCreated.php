@@ -7,7 +7,7 @@ use Enjin\Platform\Marketplace\Enums\FeeSide;
 use Enjin\Platform\Marketplace\Enums\ListingState;
 use Enjin\Platform\Marketplace\Enums\ListingType;
 use Enjin\Platform\Marketplace\Events\Substrate\Marketplace\ListingCreated as ListingCreatedEvent;
-use Enjin\Platform\Marketplace\Models\MarketplaceListing;
+use Enjin\Platform\Marketplace\Models\Laravel\MarketplaceListing;
 use Enjin\Platform\Marketplace\Models\MarketplaceState;
 use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\MarketplaceSubstrateEvent;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\ListingCreated as ListingCreatedPolkadart;
