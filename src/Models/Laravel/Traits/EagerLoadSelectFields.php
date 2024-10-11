@@ -69,13 +69,14 @@ trait EagerLoadSelectFields
         bool $isParent = false
     ): array {
         $fields = Arr::get($selections, $attribute, $selections);
+
         $select = array_filter([
             'id',
             'listing_chain_id',
             isset($fields['seller']) ? 'seller_wallet_id' : null,
             isset($fields['state']) || isset($fields['data']) ? 'type' : null,
-            ...(isset($fields['state']) ? ['amount_filled', 'type'] : []),
-            ...(isset($fields['data']) ? ['start_block', 'end_block', 'type'] : []),
+            ...(isset($fields['state']) ? ['amount_filled', 'counter_offer_count', 'type'] : []),
+            ...(isset($fields['data']) ? ['auction_start_block', 'auction_end_block', 'offer_expiration', 'type'] : []),
             ...(isset($fields['makeAssetId']) ? ['make_collection_chain_id', 'make_token_chain_id'] : []),
             ...(isset($fields['takeAssetId']) ? ['take_collection_chain_id', 'take_token_chain_id'] : []),
             ...MarketplaceListingType::getSelectFields($fieldKeys = array_keys($fields)),

@@ -4,7 +4,7 @@ namespace Enjin\Platform\Marketplace\GraphQL\Types;
 
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class AuctionDataType extends Type
+class OfferStateType extends Type
 {
     /**
      * Get the type's attributes.
@@ -12,8 +12,8 @@ class AuctionDataType extends Type
     public function attributes(): array
     {
         return [
-            'name' => 'AuctionData',
-            'description' => __('enjin-platform-marketplace::type.auction_data.description'),
+            'name' => 'OfferState',
+            'description' => __('enjin-platform-marketplace::type.offer_state.description'),
         ];
     }
 
@@ -27,15 +27,10 @@ class AuctionDataType extends Type
                 'type' => GraphQL::type('ListingType!'),
                 'description' => __('enjin-platform-marketplace::enum.listing_type.description'),
             ],
-            'startBlock' => [
+            'counterOfferCount' => [
                 'type' => GraphQL::type('Int!'),
-                'description' => __('enjin-platform-marketplace::type.auction_data.field.startBlock'),
-                'alias' => 'auction_start_block',
-            ],
-            'endBlock' => [
-                'type' => GraphQL::type('Int!'),
-                'description' => __('enjin-platform-marketplace::type.auction_data.field.endBlock'),
-                'alias' => 'auction_end_block',
+                'description' => __('enjin-platform-marketplace::type.offer_state.field.counterOfferCount'),
+                'alias' => 'counter_offer_count',
             ],
         ];
     }

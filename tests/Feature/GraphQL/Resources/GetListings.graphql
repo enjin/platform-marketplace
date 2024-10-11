@@ -43,11 +43,15 @@ query GetListings(
         salt
         state {
           ... on FixedPriceState {
-            amountFilled
             type
+            amountFilled
           }
           ... on AuctionState {
             type
+          }
+          ... on OfferState {
+            type
+            counterOfferCount
           }
         }
         data {
@@ -58,6 +62,10 @@ query GetListings(
             type
             startBlock
             endBlock
+          }
+          ... on OfferData {
+            type
+            expiration
           }
         }
         seller {

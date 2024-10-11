@@ -3,12 +3,12 @@
 namespace Enjin\Platform\Marketplace\Tests\Unit;
 
 use Enjin\Platform\Facades\TransactionSerializer;
+use Enjin\Platform\Marketplace\Enums\ListingType;
 use Enjin\Platform\Marketplace\GraphQL\Mutations\CancelListingMutation;
 use Enjin\Platform\Marketplace\GraphQL\Mutations\CreateListingMutation;
 use Enjin\Platform\Marketplace\GraphQL\Mutations\FillListingMutation;
 use Enjin\Platform\Marketplace\GraphQL\Mutations\FinalizeAuctionMutation;
 use Enjin\Platform\Marketplace\GraphQL\Mutations\PlaceBidMutation;
-use Enjin\Platform\Marketplace\Models\Substrate\AuctionDataParams;
 use Enjin\Platform\Marketplace\Models\Substrate\MultiTokensTokenAssetIdParams;
 use Enjin\Platform\Marketplace\Services\Processor\Substrate\Codec\Codec;
 use Enjin\Platform\Marketplace\Tests\TestCase;
@@ -32,12 +32,15 @@ class EncodingTest extends TestCase
             amount: 1,
             price: 1,
             salt: 'test',
-            auctionData: new AuctionDataParams(100, 1000)
+            listingData: ['type' => ListingType::AUCTION->name, 'auctionParams' => [
+                'startBlock' => 100,
+                'endBlock' => 1000,
+            ]],
         ));
 
         $callIndex = $this->codec->encoder()->getCallIndex('Marketplace.create_listing', true);
         $this->assertEquals(
-            "0x{$callIndex}4277010004427701000404041074657374019101a10f",
+            "0x{$callIndex}4277010004427701000404041074657374019101a10f00",
             $data
         );
     }

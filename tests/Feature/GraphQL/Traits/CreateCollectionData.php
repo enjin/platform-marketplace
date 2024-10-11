@@ -2,7 +2,6 @@
 
 namespace Enjin\Platform\Marketplace\Tests\Feature\GraphQL\Traits;
 
-use Enjin\Platform\Enums\Substrate\TokenMintCapType;
 use Enjin\Platform\Models\Collection;
 use Enjin\Platform\Models\Token;
 use Enjin\Platform\Models\Wallet;
@@ -46,7 +45,7 @@ trait CreateCollectionData
             'owner_wallet_id' => $this->wallet->id,
             'max_token_count' => fake()->numberBetween(1),
             'max_token_supply' => (string) fake()->numberBetween(1),
-            'force_single_mint' => fake()->boolean(),
+            'force_collapsing_supply' => fake()->boolean(),
             'is_frozen' => false,
             'token_count' => '0',
             'attribute_count' => '0',
@@ -57,13 +56,10 @@ trait CreateCollectionData
         $this->token = Token::create([
             'collection_id' => $this->collection->id,
             'token_chain_id' => (string) fake()->unique()->numberBetween(2000),
-            'supply' => (string) $supply = fake()->numberBetween(1),
-            'cap' => TokenMintCapType::INFINITE->name,
+            'supply' => (string) fake()->numberBetween(1),
+            'cap' => null,
             'cap_supply' => null,
             'is_frozen' => false,
-            'unit_price' => (string) $unitPrice = fake()->numberBetween(1 / $supply * 10 ** 17),
-            'mint_deposit' => (string) ($unitPrice * $supply),
-            'minimum_balance' => '1',
             'attribute_count' => '0',
         ]);
     }

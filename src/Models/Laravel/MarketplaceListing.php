@@ -41,8 +41,10 @@ class MarketplaceListing extends BaseModel
         'deposit',
         'salt',
         'type',
-        'start_block',
-        'end_block',
+        'auction_start_block',
+        'auction_end_block',
+        'offer_expiration',
+        'counter_offer_count',
         'amount_filled',
     ];
 

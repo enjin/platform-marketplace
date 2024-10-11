@@ -29,6 +29,7 @@ class ListingStateUnion extends UnionType implements PlatformGraphQlUnion
         return [
             GraphQL::type('FixedPriceState'),
             GraphQL::type('AuctionState'),
+            GraphQL::type('OfferState'),
         ];
     }
 
@@ -40,6 +41,7 @@ class ListingStateUnion extends UnionType implements PlatformGraphQlUnion
         return match ($objectValue?->type) {
             ListingType::FIXED_PRICE->name => GraphQL::type('FixedPriceState'),
             ListingType::AUCTION->name => GraphQL::type('AuctionState'),
+            ListingType::OFFER->name => GraphQL::type('OfferState'),
             default => null,
         };
     }

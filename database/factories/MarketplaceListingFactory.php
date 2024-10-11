@@ -35,8 +35,10 @@ class MarketplaceListingFactory extends Factory
             'deposit' => fake()->numberBetween(1, 100),
             'salt' => fake()->text(),
             'type' => $state = ListingType::caseNamesAsCollection()->random(),
-            'start_block' => $state == ListingType::AUCTION->name ? fake()->numberBetween(1, 100) : null,
-            'end_block' => $state == ListingType::AUCTION->name ? fake()->numberBetween(100, 200) : null,
+            'auction_start_block' => $state == ListingType::AUCTION->name ? fake()->numberBetween(1, 100) : null,
+            'auction_end_block' => $state == ListingType::AUCTION->name ? fake()->numberBetween(100, 200) : null,
+            'offer_expiration' => $state == ListingType::OFFER->name ? fake()->numberBetween(100, 200) : null,
+            'counter_offer_count' => $state == ListingType::OFFER->name ? fake()->numberBetween(0, 10) : null,
             'amount_filled' =>  $state == ListingType::FIXED_PRICE->name ? fake()->numberBetween(1000, 2000) : null,
         ];
     }
