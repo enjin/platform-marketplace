@@ -26,7 +26,7 @@ class ListingDataInputType extends InputType
         return [
             'type' => [
                 'type' => GraphQL::type('ListingType!'),
-                'description' => __('enjin-platform-marketplace::enum.listing_type.description'),
+                'description' => __('enjin-platform-marketplace::type.listing_data.field.type'),
             ],
             'auctionParams' => [
                 'type' => GraphQL::type('AuctionParamsInput'),

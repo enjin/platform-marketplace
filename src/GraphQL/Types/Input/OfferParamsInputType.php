@@ -14,7 +14,7 @@ class OfferParamsInputType extends InputType
     {
         return [
             'name' => 'OfferParamsInput',
-            'description' => __('enjin-platform-marketplace::type.listing_data.description'),
+            'description' => __('enjin-platform-marketplace::type.offer_data.description'),
         ];
     }
 
@@ -26,7 +26,7 @@ class OfferParamsInputType extends InputType
         return [
             'expiration' => [
                 'type' => GraphQL::type('Int'),
-                'description' => __('enjin-platform-marketplace::type.auction_data.field.startBlock'),
+                'description' => __('enjin-platform-marketplace::type.offer_data.field.expiration'),
             ],
         ];
     }

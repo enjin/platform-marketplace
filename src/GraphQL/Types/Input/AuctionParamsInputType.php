@@ -14,7 +14,7 @@ class AuctionParamsInputType extends InputType
     {
         return [
             'name' => 'AuctionParamsInput',
-            'description' => __('enjin-platform-marketplace::type.listing_data.description'),
+            'description' => __('enjin-platform-marketplace::type.auction_data.description'),
         ];
     }
 
