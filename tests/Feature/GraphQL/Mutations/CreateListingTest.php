@@ -33,12 +33,67 @@ class CreateListingTest extends TestCaseGraphQL
         Block::updateOrCreate(['number' => 1000]);
     }
 
-    public function test_it_can_create_listing(): void
+    public function test_it_can_create_listing_auction(): void
     {
         $response = $this->graphql(
             $this->method,
             $params = $this->generateParams()
         );
+
+        $params['makeAssetId'] = new MultiTokensTokenAssetIdParams(
+            Arr::get($params, 'makeAssetId.collectionId'),
+            $this->encodeTokenId(Arr::get($params, 'makeAssetId'))
+        );
+        $params['takeAssetId'] = new MultiTokensTokenAssetIdParams(
+            Arr::get($params, 'takeAssetId.collectionId'),
+            $this->encodeTokenId(Arr::get($params, 'takeAssetId'))
+        );
+
+        $this->assertEquals(
+            $response['encodedData'],
+            TransactionSerializer::encode($this->method, CreateListingMutation::getEncodableParams(...$params))
+        );
+
+        $this->assertNull(Arr::get($response, 'wallet.account.publicKey'));
+    }
+
+    public function test_it_can_create_listing_fixed_price(): void
+    {
+        $params = $this->generateParams();
+        $params['listingData'] = [
+            'type' => ListingType::FIXED_PRICE->name,
+        ];
+
+        $response = $this->graphql($this->method, $params);
+
+        $params['makeAssetId'] = new MultiTokensTokenAssetIdParams(
+            Arr::get($params, 'makeAssetId.collectionId'),
+            $this->encodeTokenId(Arr::get($params, 'makeAssetId'))
+        );
+        $params['takeAssetId'] = new MultiTokensTokenAssetIdParams(
+            Arr::get($params, 'takeAssetId.collectionId'),
+            $this->encodeTokenId(Arr::get($params, 'takeAssetId'))
+        );
+
+        $this->assertEquals(
+            $response['encodedData'],
+            TransactionSerializer::encode($this->method, CreateListingMutation::getEncodableParams(...$params))
+        );
+
+        $this->assertNull(Arr::get($response, 'wallet.account.publicKey'));
+    }
+
+    public function test_it_can_create_listing_offer(): void
+    {
+        $params = $this->generateParams();
+        $params['listingData'] = [
+            'type' => ListingType::OFFER->name,
+            'offerParams' => [
+                'expiration' => 50000,
+            ],
+        ];
+
+        $response = $this->graphql($this->method, $params);
 
         $params['makeAssetId'] = new MultiTokensTokenAssetIdParams(
             Arr::get($params, 'makeAssetId.collectionId'),

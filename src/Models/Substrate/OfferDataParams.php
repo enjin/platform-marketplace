@@ -16,6 +16,8 @@ class OfferDataParams
      */
     public function toEncodable(): array
     {
-        return ['startBlock' => $this->startBlock, 'endBlock' => $this->endBlock];
+        return [
+            'expiration' => $this->expiration,
+        ];
     }
 }
