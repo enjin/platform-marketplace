@@ -130,7 +130,8 @@ class CreateListingTest extends TestCaseGraphQL
                 'salt' => fake()->text(10),
                 'listingData' => [
                     'type' => ListingType::AUCTION->name,
-                    'auctionParams' => ['startBlock' => fake()->numberBetween(1011, 5000),
+                    'auctionParams' => [
+                        'startBlock' => fake()->numberBetween(1011, 5000),
                         'endBlock' => fake()->numberBetween(5001, 10000),
                     ],
                 ],
