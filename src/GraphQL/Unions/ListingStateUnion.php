@@ -13,6 +13,7 @@ class ListingStateUnion extends UnionType implements PlatformGraphQlUnion
     /**
      * Get the type's attributes.
      */
+    #[\Override]
     public function attributes(): array
     {
         return [
@@ -24,6 +25,7 @@ class ListingStateUnion extends UnionType implements PlatformGraphQlUnion
     /**
      * The possible types that this union can be.
      */
+    #[\Override]
     public function types(): array
     {
         return [

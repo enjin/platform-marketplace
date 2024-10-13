@@ -24,6 +24,7 @@ class GetBidsQuery extends Query
     /**
      * Get the mutation's attributes.
      */
+    #[\Override]
     public function attributes(): array
     {
         return [
@@ -35,6 +36,7 @@ class GetBidsQuery extends Query
     /**
      * Get the mutation's return type.
      */
+    #[\Override]
     public function type(): Type
     {
         return GraphQL::paginate('MarketplaceBid', 'MarketplaceBidConnection');
@@ -43,6 +45,7 @@ class GetBidsQuery extends Query
     /**
      * Get the mutation's arguments definition.
      */
+    #[\Override]
     public function args(): array
     {
         return ConnectionInput::args([
@@ -96,6 +99,7 @@ class GetBidsQuery extends Query
     /**
      * Get the mutation's request validation rules.
      */
+    #[\Override]
     protected function rules(array $args = []): array
     {
         return [

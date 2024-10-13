@@ -11,6 +11,7 @@ class MarketplaceServiceTest extends TestCase
 {
     use CreateCollectionData;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

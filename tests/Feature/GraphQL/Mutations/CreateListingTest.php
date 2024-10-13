@@ -27,6 +27,7 @@ class CreateListingTest extends TestCaseGraphQL
     /**
      * Setup test case.
      */
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

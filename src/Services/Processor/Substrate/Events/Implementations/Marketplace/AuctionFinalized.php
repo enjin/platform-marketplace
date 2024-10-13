@@ -23,6 +23,7 @@ class AuctionFinalized extends MarketplaceSubstrateEvent
     /**
      * Handles the auction finalized event.
      */
+    #[\Override]
     public function run(): void
     {
         try {
@@ -62,6 +63,7 @@ class AuctionFinalized extends MarketplaceSubstrateEvent
         }
     }
 
+    #[\Override]
     public function log(): void
     {
         Log::debug(
@@ -74,6 +76,7 @@ class AuctionFinalized extends MarketplaceSubstrateEvent
 
     }
 
+    #[\Override]
     public function broadcast(): void
     {
         AuctionFinalizedEvent::safeBroadcast(

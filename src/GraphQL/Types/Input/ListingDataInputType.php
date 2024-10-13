@@ -10,6 +10,7 @@ class ListingDataInputType extends InputType
     /**
      * Get the type's attributes.
      */
+    #[\Override]
     public function attributes(): array
     {
         return [
@@ -21,6 +22,7 @@ class ListingDataInputType extends InputType
     /**
      * Get the type's fields.
      */
+    #[\Override]
     public function fields(): array
     {
         return [

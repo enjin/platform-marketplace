@@ -25,6 +25,7 @@ class ListingCreated extends MarketplaceSubstrateEvent
     /**
      * Handles the listing created event.
      */
+    #[\Override]
     public function run(): void
     {
         if (!$this->shouldSyncCollection(Arr::get($this->event->makeAssetId, 'collection_id'))
@@ -72,6 +73,7 @@ class ListingCreated extends MarketplaceSubstrateEvent
         ];
     }
 
+    #[\Override]
     public function log(): void
     {
         Log::debug(
@@ -82,6 +84,7 @@ class ListingCreated extends MarketplaceSubstrateEvent
         );
     }
 
+    #[\Override]
     public function broadcast(): void
     {
         ListingCreatedEvent::safeBroadcast(

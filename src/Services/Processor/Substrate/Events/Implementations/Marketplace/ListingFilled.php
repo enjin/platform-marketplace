@@ -19,6 +19,7 @@ class ListingFilled extends MarketplaceSubstrateEvent
     /**
      * Handles the listing filled event.
      */
+    #[\Override]
     public function run(): void
     {
         try {
@@ -51,6 +52,7 @@ class ListingFilled extends MarketplaceSubstrateEvent
         }
     }
 
+    #[\Override]
     public function log(): void
     {
         Log::debug(
@@ -63,6 +65,7 @@ class ListingFilled extends MarketplaceSubstrateEvent
         );
     }
 
+    #[\Override]
     public function broadcast(): void
     {
         ListingFilledEvent::safeBroadcast(

@@ -13,6 +13,7 @@ class MarketplaceServiceProvider extends PackageServiceProvider
     /**
      * Configure provider.
      */
+    #[\Override]
     public function configurePackage(Package $package): void
     {
         $package
@@ -34,6 +35,7 @@ class MarketplaceServiceProvider extends PackageServiceProvider
      *
      * @return void
      */
+    #[\Override]
     public function register()
     {
         if (app()->runningUnitTests()) {
@@ -50,12 +52,14 @@ class MarketplaceServiceProvider extends PackageServiceProvider
      *
      * @return void
      */
+    #[\Override]
     public function boot()
     {
         parent::boot();
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
     }
 
+    #[\Override]
     public function packageRegistered()
     {
         $this->loadTranslationsFrom(__DIR__ . '/../lang', 'enjin-platform-marketplace');

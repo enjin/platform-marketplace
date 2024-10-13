@@ -17,6 +17,7 @@ class EncodingTest extends TestCase
 {
     protected Codec $codec;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

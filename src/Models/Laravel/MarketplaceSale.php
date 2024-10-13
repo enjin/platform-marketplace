@@ -68,6 +68,7 @@ class MarketplaceSale extends BaseModel
         return MarketplaceSaleFactory::new();
     }
 
+    #[\Override]
     protected function pivotIdentifier(): Attribute
     {
         return new Attribute(
@@ -75,6 +76,7 @@ class MarketplaceSale extends BaseModel
         );
     }
 
+    #[\Override]
     protected function ownerId(): Attribute
     {
         return Attribute::make(

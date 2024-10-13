@@ -116,6 +116,7 @@ class MarketplaceListing extends BaseModel
         return MarketplaceListingFactory::new();
     }
 
+    #[\Override]
     protected function pivotIdentifier(): Attribute
     {
         return new Attribute(
@@ -123,6 +124,7 @@ class MarketplaceListing extends BaseModel
         );
     }
 
+    #[\Override]
     protected function ownerId(): Attribute
     {
         return Attribute::make(

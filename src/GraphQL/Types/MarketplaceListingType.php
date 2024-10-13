@@ -16,6 +16,7 @@ class MarketplaceListingType extends Type
     /**
      * Get the type's attributes.
      */
+    #[\Override]
     public function attributes(): array
     {
         return [
@@ -27,6 +28,7 @@ class MarketplaceListingType extends Type
     /**
      * Get the type's fields.
      */
+    #[\Override]
     public function fields(): array
     {
         return [
