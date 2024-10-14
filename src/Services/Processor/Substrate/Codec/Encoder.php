@@ -8,7 +8,6 @@ class Encoder extends BaseEncoder
 {
     protected static array $callIndexKeys = [
         'CreateListing' => 'Marketplace.create_listing',
-        'CreateListingV1010' => 'Marketplace.create_listing',
         'CancelListing' => 'Marketplace.cancel_listing',
         'FillListing' => 'Marketplace.fill_listing',
         'FinalizeAuction' => 'Marketplace.finalize_auction',

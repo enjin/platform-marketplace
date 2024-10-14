@@ -18,11 +18,15 @@ query GetListing($id: BigInt, $listingId: String) {
     salt
     state {
       ... on FixedPriceState {
-        amountFilled
         type
+        amountFilled
       }
       ... on AuctionState {
         type
+      }
+      ... on OfferState {
+        type
+        counterOfferCount
       }
     }
     data {
@@ -33,6 +37,10 @@ query GetListing($id: BigInt, $listingId: String) {
         type
         startBlock
         endBlock
+      }
+      ... on OfferData {
+        type
+        expiration
       }
     }
     seller {

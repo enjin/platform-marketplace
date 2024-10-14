@@ -31,4 +31,12 @@ return [
     'marketplace_sale.description' => 'The listing sale.',
     'marketplace_state.description' => 'The state of the marketplace listing.',
     'marketplace_state.field.height' => 'The block height.',
+    'listing_data.description' => 'The data for a listing.',
+    'listing_data.field.type' => 'The type of listing.',
+    'listing_data.field.auctionParams' => 'The parameters for an auction listing.',
+    'listing_data.field.offerParams' => 'The parameters for an offer.',
+    'offer_data.description' => 'The parameters for an offer.',
+    'offer_data.field.expiration' => 'The expiration time for the offer.',
+    'offer_state.description' => 'The state of an offer.',
+    'offer_state.field.counterOfferCount' => 'The number of counter offers.',
 ];

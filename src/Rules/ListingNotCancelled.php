@@ -14,6 +14,7 @@ class ListingNotCancelled implements ValidationRule
      *
      * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
+    #[\Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (!$listing = MarketplaceListing::where('listing_chain_id', $value)->with('state')->first()) {

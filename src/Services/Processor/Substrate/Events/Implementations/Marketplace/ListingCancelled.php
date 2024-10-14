@@ -20,6 +20,7 @@ class ListingCancelled extends MarketplaceSubstrateEvent
     /**
      * Handles the listing cancelled event.
      */
+    #[\Override]
     public function run(): void
     {
         try {
@@ -50,6 +51,7 @@ class ListingCancelled extends MarketplaceSubstrateEvent
         }
     }
 
+    #[\Override]
     public function log(): void
     {
         Log::debug(
@@ -60,6 +62,7 @@ class ListingCancelled extends MarketplaceSubstrateEvent
         );
     }
 
+    #[\Override]
     public function broadcast(): void
     {
         ListingCancelledEvent::safeBroadcast(

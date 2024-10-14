@@ -21,6 +21,7 @@ class BidPlaced extends MarketplaceSubstrateEvent
     /**
      * Handles the bid placed event.
      */
+    #[\Override]
     public function run(): void
     {
         try {
@@ -53,6 +54,7 @@ class BidPlaced extends MarketplaceSubstrateEvent
         }
     }
 
+    #[\Override]
     public function log(): void
     {
         Log::debug(
@@ -64,6 +66,7 @@ class BidPlaced extends MarketplaceSubstrateEvent
         );
     }
 
+    #[\Override]
     public function broadcast(): void
     {
         BidPlacedEvent::safeBroadcast(

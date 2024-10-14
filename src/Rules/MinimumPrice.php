@@ -23,6 +23,7 @@ class MinimumPrice implements DataAwareRule, ValidationRule
      * @param  array  $data
      * @return $this
      */
+    #[\Override]
     public function setData($data)
     {
         $this->data = $data;
@@ -35,6 +36,7 @@ class MinimumPrice implements DataAwareRule, ValidationRule
      *
      * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
+    #[\Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if ($listingId = Arr::get($this->data, 'listingId')) {

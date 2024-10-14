@@ -9,6 +9,7 @@ class AuctionDataType extends Type
     /**
      * Get the type's attributes.
      */
+    #[\Override]
     public function attributes(): array
     {
         return [
@@ -20,6 +21,7 @@ class AuctionDataType extends Type
     /**
      * Get the type's fields.
      */
+    #[\Override]
     public function fields(): array
     {
         return [
@@ -30,12 +32,12 @@ class AuctionDataType extends Type
             'startBlock' => [
                 'type' => GraphQL::type('Int!'),
                 'description' => __('enjin-platform-marketplace::type.auction_data.field.startBlock'),
-                'alias' => 'start_block',
+                'alias' => 'auction_start_block',
             ],
             'endBlock' => [
                 'type' => GraphQL::type('Int!'),
                 'description' => __('enjin-platform-marketplace::type.auction_data.field.endBlock'),
-                'alias' => 'end_block',
+                'alias' => 'auction_end_block',
             ],
         ];
     }

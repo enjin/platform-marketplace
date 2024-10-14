@@ -17,6 +17,7 @@ class GetListingQuery extends Query
     /**
      * Get the mutation's attributes.
      */
+    #[\Override]
     public function attributes(): array
     {
         return [
@@ -28,6 +29,7 @@ class GetListingQuery extends Query
     /**
      * Get the mutation's return type.
      */
+    #[\Override]
     public function type(): Type
     {
         return GraphQL::type('MarketplaceListing!');
@@ -36,6 +38,7 @@ class GetListingQuery extends Query
     /**
      * Get the mutation's arguments definition.
      */
+    #[\Override]
     public function args(): array
     {
         return [
@@ -73,6 +76,7 @@ class GetListingQuery extends Query
     /**
      * Get the mutation's request validation rules.
      */
+    #[\Override]
     protected function rules(array $args = []): array
     {
         return [

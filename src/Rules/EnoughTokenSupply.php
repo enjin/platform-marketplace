@@ -28,6 +28,7 @@ class EnoughTokenSupply implements DataAwareRule, ValidationRule
      * @param  array  $data
      * @return $this
      */
+    #[\Override]
     public function setData($data)
     {
         $this->data = $data;
@@ -40,6 +41,7 @@ class EnoughTokenSupply implements DataAwareRule, ValidationRule
      *
      * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
+    #[\Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $collectionId = Arr::get($this->data, 'makeAssetId.collectionId');

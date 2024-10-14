@@ -41,8 +41,10 @@ class MarketplaceListing extends BaseModel
         'deposit',
         'salt',
         'type',
-        'start_block',
-        'end_block',
+        'auction_start_block',
+        'auction_end_block',
+        'offer_expiration',
+        'counter_offer_count',
         'amount_filled',
     ];
 
@@ -114,6 +116,7 @@ class MarketplaceListing extends BaseModel
         return MarketplaceListingFactory::new();
     }
 
+    #[\Override]
     protected function pivotIdentifier(): Attribute
     {
         return new Attribute(
@@ -121,6 +124,7 @@ class MarketplaceListing extends BaseModel
         );
     }
 
+    #[\Override]
     protected function ownerId(): Attribute
     {
         return Attribute::make(

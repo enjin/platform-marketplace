@@ -4,7 +4,7 @@ mutation CreateListing(
   $amount: BigInt!
   $price: BigInt!
   $salt: String!
-  $auctionData: AuctionDataInputType
+  $listingData: ListingDataInput!
   $signingAccount: String
   $skipValidation: Boolean
 ) {
@@ -14,7 +14,7 @@ mutation CreateListing(
     amount: $amount
     price: $price
     salt: $salt
-    auctionData: $auctionData
+    listingData: $listingData
     signingAccount: $signingAccount
     skipValidation: $skipValidation
   ) {

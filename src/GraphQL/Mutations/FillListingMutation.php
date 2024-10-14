@@ -35,6 +35,7 @@ class FillListingMutation extends Mutation implements PlatformBlockchainTransact
     /**
      * Get the mutation's attributes.
      */
+    #[\Override]
     public function attributes(): array
     {
         return [
@@ -46,6 +47,7 @@ class FillListingMutation extends Mutation implements PlatformBlockchainTransact
     /**
      * Get the mutation's return type.
      */
+    #[\Override]
     public function type(): Type
     {
         return GraphQL::type('Transaction!');
@@ -54,6 +56,7 @@ class FillListingMutation extends Mutation implements PlatformBlockchainTransact
     /**
      * Get the mutation's arguments definition.
      */
+    #[\Override]
     public function args(): array
     {
         return [
@@ -90,6 +93,7 @@ class FillListingMutation extends Mutation implements PlatformBlockchainTransact
         );
     }
 
+    #[\Override]
     public static function getEncodableParams(...$params): array
     {
         return [

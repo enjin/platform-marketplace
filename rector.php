@@ -11,7 +11,7 @@ return RectorConfig::configure()
         __DIR__ . '/src',
         __DIR__ . '/tests',
     ])
-    ->withPhpSets(php82: true)
+    ->withPhpSets(php83: true)
     ->withPreparedSets(deadCode: true)
     ->withRules([Spatie\Ray\Rector\RemoveRayCallRector::class])
     ->withTypeCoverageLevel(0);

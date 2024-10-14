@@ -13,8 +13,11 @@ use Enjin\Platform\GraphQL\Types\Input\Substrate\Traits\HasIdempotencyField;
 use Enjin\Platform\GraphQL\Types\Input\Substrate\Traits\HasSigningAccountField;
 use Enjin\Platform\GraphQL\Types\Input\Substrate\Traits\HasSimulateField;
 use Enjin\Platform\Interfaces\PlatformBlockchainTransaction;
+use Enjin\Platform\Marketplace\Enums\ListingType;
 use Enjin\Platform\Marketplace\Models\Substrate\AuctionDataParams;
+use Enjin\Platform\Marketplace\Models\Substrate\ListingDataParams;
 use Enjin\Platform\Marketplace\Models\Substrate\MultiTokensTokenAssetIdParams;
+use Enjin\Platform\Marketplace\Models\Substrate\OfferDataParams;
 use Enjin\Platform\Marketplace\Rules\EnoughTokenSupply;
 use Enjin\Platform\Marketplace\Rules\FutureBlock;
 use Enjin\Platform\Marketplace\Rules\TokenExistsInCollection;
@@ -43,6 +46,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
     /**
      * Get the mutation's attributes.
      */
+    #[\Override]
     public function attributes(): array
     {
         return [
@@ -54,6 +58,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
     /**
      * Get the mutation's return type.
      */
+    #[\Override]
     public function type(): Type
     {
         return GraphQL::type('Transaction!');
@@ -62,6 +67,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
     /**
      * Get the mutation's arguments definition.
      */
+    #[\Override]
     public function args(): array
     {
         return [
@@ -85,14 +91,9 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 'type' => GraphQL::type('String'),
                 'description' => __('enjin-platform-marketplace::type.marketplace_listing.field.salt'),
             ],
-            // TODO: We should remove `auctionData` and replace it with `listingData`
-            //  listingData = FixedPrice, Auction, Offer
-            //      FixedPrice => null,
-            //      Auction => { startBlock, endBlock },
-            //      Offer => { expiration }
-            'auctionData' => [
-                'type' => GraphQL::type('AuctionDataInputType'),
-                'description' => __('enjin-platform-marketplace::input_type.auction_data.description'),
+            'listingData' => [
+                'type' => GraphQL::type('ListingDataInput'),
+                'description' => __('enjin-platform-marketplace::mutation.create_listing.args.listingData'),
             ],
             ...$this->getSigningAccountField(),
             ...$this->getIdempotencyField(),
@@ -111,8 +112,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         ResolveInfo $resolveInfo,
         Closure $getSelectFields,
     ) {
-        $method = isRunningLatest() ? $this->getMutationName() . 'V1010' : $this->getMutationName();
-        $encodedData = TransactionSerializer::encode($method, static::getEncodableParams(
+        $encodedData = TransactionSerializer::encode($this->getMutationName(), static::getEncodableParams(
             makeAssetId: new MultiTokensTokenAssetIdParams(
                 Arr::get($args, 'makeAssetId.collectionId'),
                 $this->encodeTokenId(Arr::get($args, 'makeAssetId'))
@@ -124,9 +124,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
             amount: Arr::get($args, 'amount'),
             price: Arr::get($args, 'price'),
             salt: Arr::get($args, 'salt', Str::random(10)),
-            auctionData: ($data = Arr::get($args, 'auctionData'))
-                ? new AuctionDataParams(Arr::get($data, 'startBlock'), Arr::get($data, 'endBlock'))
-                : null
+            listingData: Arr::get($args, 'listingData'),
         ));
 
         return Transaction::lazyLoadSelectFields(
@@ -135,6 +133,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         );
     }
 
+    #[\Override]
     public static function getEncodableParams(...$params): array
     {
         $makeAsset = Arr::get($params, 'makeAssetId', new MultiTokensTokenAssetIdParams('0', '0'));
@@ -142,17 +141,18 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         $amount = Arr::get($params, 'amount', 0);
         $price = Arr::get($params, 'price', 0);
         $salt = Arr::get($params, 'salt', Str::random(10));
-        $auctionData = Arr::get($params, 'auctionData');
-
-        $extra = isRunningLatest() ? [
-            'listingData' => $auctionData ? [
-                'Auction' => $auctionData->toEncodable(),
-            ] : [
-                'FixedPrice' => null,
-            ],
-        ] : [
-            'auctionData' => $auctionData?->toEncodable(),
-        ];
+        $listingType = ListingType::getEnumCase(Arr::get($params, 'listingData.type'));
+        $listingData = match ($listingType) {
+            ListingType::AUCTION => new ListingDataParams(
+                ListingType::AUCTION,
+                auctionParams: new AuctionDataParams(...Arr::get($params, 'listingData.auctionParams')),
+            ),
+            ListingType::OFFER => new ListingDataParams(
+                ListingType::OFFER,
+                offerParams: new OfferDataParams(...Arr::get($params, 'listingData.offerParams'))
+            ),
+            default => new ListingDataParams(ListingType::FIXED_PRICE),
+        };
 
         return [
             'makeAssetId' => $makeAsset->toEncodable(),
@@ -160,7 +160,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
             'amount' => gmp_init($amount),
             'price' => gmp_init($price),
             'salt' => HexConverter::stringToHexPrefixed($salt),
-            ...$extra,
+            'listingData' => $listingData->toEncodable(),
             'depositor' => null,
         ];
     }
@@ -210,13 +210,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 new MaxBigInt(),
             ],
             'salt' => ['bail', 'filled', 'max:255'],
-            'auctionData.endBlock' => [
-                'bail',
-                'required_with:auctionData.startBlock',
-                new MinBigInt(),
-                new MaxBigInt(Hex::MAX_UINT32),
-                'gt:auctionData.startBlock',
-            ],
+            'listingData.type' => ['required'],
         ];
     }
 
@@ -227,6 +221,24 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
     {
         $makeRule = $this->makeOrTakeRuleExist($makeCollection = Arr::get($args, 'makeAssetId.collectionId'));
         $takeRule = $this->makeOrTakeRuleExist($takeCollection = Arr::get($args, 'takeAssetId.collectionId'), false);
+        $listingDataType = ListingType::getEnumCase(Arr::get($args, 'listingData.type'));
+        $extras = match ($listingDataType) {
+            ListingType::AUCTION => [
+                'listingData.auctionParams' => ['required'],
+                'listingData.offerParams' => ['prohibited'],
+                'listingData.auctionParams.startBlock' => ['bail', 'required', new MinBigInt(), new MaxBigInt(Hex::MAX_UINT32), new FutureBlock()],
+                'listingData.auctionParams.endBlock' => ['bail', 'required',  new MinBigInt(), new MaxBigInt(Hex::MAX_UINT32), 'gt:listingData.auctionParams.startBlock', new FutureBlock()],
+            ],
+            ListingType::OFFER => [
+                'listingData.offerParams' => ['required'],
+                'listingData.auctionParams' => ['prohibited'],
+                'listingData.offerParams.expiration' => ['bail', 'nullable', new MinBigInt(), new MaxBigInt(Hex::MAX_UINT32), new FutureBlock()],
+            ],
+            default => [
+                'listingData.auctionParams' => ['prohibited'],
+                'listingData.offerParams' => ['prohibited'],
+            ],
+        };
 
         return [
             'makeAssetId' => new TokenExistsInCollection($makeCollection),
@@ -241,14 +253,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 new MaxBigInt(),
                 new EnoughTokenSupply(),
             ],
-            'auctionData.startBlock' => [
-                'bail',
-                'required_with:auctionData.endBlock',
-                new MinBigInt(),
-                new MaxBigInt(Hex::MAX_UINT32),
-                new FutureBlock(),
-                'lte:auctionData.endBlock',
-            ],
+            ...$extras,
         ];
     }
 
@@ -259,6 +264,24 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
     {
         $makeRule = $this->makeOrTakeRule(Arr::get($args, 'makeAssetId.collectionId'));
         $takeRule = $this->makeOrTakeRule(Arr::get($args, 'takeAssetId.collectionId'), false);
+        $listingDataType = ListingType::getEnumCase(Arr::get($args, 'listingData.type'));
+        $extras = match ($listingDataType) {
+            ListingType::AUCTION => [
+                'listingData.auctionParams' => ['required'],
+                'listingData.offerParams' => ['prohibited'],
+                'listingData.auctionParams.startBlock' => ['bail', 'required', new MinBigInt(), new MaxBigInt(Hex::MAX_UINT32)],
+                'listingData.auctionParams.endBlock' => ['bail', 'required',  new MinBigInt(), new MaxBigInt(Hex::MAX_UINT32), 'gt:listingData.auctionParams.startBlock'],
+            ],
+            ListingType::OFFER => [
+                'listingData.offerParams' => ['required'],
+                'listingData.auctionParams' => ['prohibited'],
+                'listingData.offerParams.expiration' => ['bail', 'nullable', new MinBigInt(), new MaxBigInt(Hex::MAX_UINT32)],
+            ],
+            default => [
+                'listingData.auctionParams' => ['prohibited'],
+                'listingData.offerParams' => ['prohibited'],
+            ],
+        };
 
         return [
             ...$makeRule,
@@ -270,13 +293,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 new MinBigInt(1),
                 new MaxBigInt(),
             ],
-            'auctionData.startBlock' => [
-                'bail',
-                'required_with:auctionData.endBlock',
-                new MinBigInt(),
-                new MaxBigInt(Hex::MAX_UINT32),
-                'lte:auctionData.endBlock',
-            ],
+            ...$extras,
         ];
     }
 }

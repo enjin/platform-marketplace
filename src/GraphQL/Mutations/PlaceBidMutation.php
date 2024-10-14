@@ -36,6 +36,7 @@ class PlaceBidMutation extends Mutation implements PlatformBlockchainTransaction
     /**
      * Get the mutation's attributes.
      */
+    #[\Override]
     public function attributes(): array
     {
         return [
@@ -47,6 +48,7 @@ class PlaceBidMutation extends Mutation implements PlatformBlockchainTransaction
     /**
      * Get the mutation's return type.
      */
+    #[\Override]
     public function type(): Type
     {
         return GraphQL::type('Transaction!');
@@ -55,6 +57,7 @@ class PlaceBidMutation extends Mutation implements PlatformBlockchainTransaction
     /**
      * Get the mutation's arguments definition.
      */
+    #[\Override]
     public function args(): array
     {
         return [
@@ -91,6 +94,7 @@ class PlaceBidMutation extends Mutation implements PlatformBlockchainTransaction
         );
     }
 
+    #[\Override]
     public static function getEncodableParams(...$params): array
     {
         return [

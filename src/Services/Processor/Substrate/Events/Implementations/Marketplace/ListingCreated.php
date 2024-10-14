@@ -7,7 +7,7 @@ use Enjin\Platform\Marketplace\Enums\FeeSide;
 use Enjin\Platform\Marketplace\Enums\ListingState;
 use Enjin\Platform\Marketplace\Enums\ListingType;
 use Enjin\Platform\Marketplace\Events\Substrate\Marketplace\ListingCreated as ListingCreatedEvent;
-use Enjin\Platform\Marketplace\Models\MarketplaceListing;
+use Enjin\Platform\Marketplace\Models\Laravel\MarketplaceListing;
 use Enjin\Platform\Marketplace\Models\MarketplaceState;
 use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\MarketplaceSubstrateEvent;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\ListingCreated as ListingCreatedPolkadart;
@@ -25,6 +25,7 @@ class ListingCreated extends MarketplaceSubstrateEvent
     /**
      * Handles the listing created event.
      */
+    #[\Override]
     public function run(): void
     {
         if (!$this->shouldSyncCollection(Arr::get($this->event->makeAssetId, 'collection_id'))
@@ -49,8 +50,9 @@ class ListingCreated extends MarketplaceSubstrateEvent
             'deposit' => $this->event->deposit,
             'salt' => $this->event->salt,
             'type' => ListingType::from(array_key_first($this->event->state))->name,
-            'start_block' => Arr::get($this->event->data, 'Auction.start_block'),
-            'end_block' => Arr::get($this->event->data, 'Auction.end_block'),
+            'auction_start_block' => Arr::get($this->event->data, 'Auction.start_block'),
+            'auction_end_block' => Arr::get($this->event->data, 'Auction.end_block'),
+            'offer_expiration' => Arr::get($this->event->data, 'Offer.expiration'),
             'amount_filled' => $this->getValue($this->event->state, ['FixedPrice.amount_filled', 'FixedPrice']),
             'created_at' => $now = Carbon::now(),
             'updated_at' => $now,
@@ -71,6 +73,7 @@ class ListingCreated extends MarketplaceSubstrateEvent
         ];
     }
 
+    #[\Override]
     public function log(): void
     {
         Log::debug(
@@ -81,6 +84,7 @@ class ListingCreated extends MarketplaceSubstrateEvent
         );
     }
 
+    #[\Override]
     public function broadcast(): void
     {
         ListingCreatedEvent::safeBroadcast(
