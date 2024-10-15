@@ -141,7 +141,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         $amount = Arr::get($params, 'amount', 0);
         $price = Arr::get($params, 'price', 0);
         $salt = Arr::get($params, 'salt', Str::random(10));
-        $listingType = ListingType::getEnumCase(Arr::get($params, 'listingData.type'));
+        $listingType = is_string($type = Arr::get($params, 'listingData.type')) ? ListingType::getEnumCase($type) : $type;
         $listingData = match ($listingType) {
             ListingType::AUCTION => new ListingDataParams(
                 ListingType::AUCTION,
@@ -210,6 +210,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 new MaxBigInt(),
             ],
             'salt' => ['bail', 'filled', 'max:255'],
+            'listingData' => ['required'],
             'listingData.type' => ['required'],
         ];
     }
