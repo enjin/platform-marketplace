@@ -6,14 +6,14 @@ use Enjin\Platform\Channels\PlatformAppChannel;
 use Enjin\Platform\Events\PlatformBroadcastEvent;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Database\Eloquent\Model;
-use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\ListingCancelled as ListingCancelledPolkadart;
+use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\ListingRemovedUnderMinimum as ListingRemovedUnderMinimumPolkadart;
 
-class ListingCancelled extends PlatformBroadcastEvent
+class ListingRemovedUnderMinimum extends PlatformBroadcastEvent
 {
     /**
      * Create a new event instance.
      */
-    public function __construct(ListingCancelledPolkadart $event, ?Model $transaction = null, ?array $extra = null)
+    public function __construct(ListingRemovedUnderMinimumPolkadart $event, ?Model $transaction = null, ?array $extra = null)
     {
         parent::__construct();
 

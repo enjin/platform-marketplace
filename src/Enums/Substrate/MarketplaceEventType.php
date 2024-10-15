@@ -7,6 +7,7 @@ use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementatio
 use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\Marketplace\ListingCancelled;
 use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\Marketplace\ListingCreated;
 use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\Marketplace\ListingFilled;
+use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\Marketplace\ListingRemovedUnderMinimum;
 use Enjin\Platform\Services\Processor\Substrate\Events\SubstrateEvent;
 use Enjin\Platform\Traits\EnumExtensions;
 
@@ -19,6 +20,7 @@ enum MarketplaceEventType: string
     case LISTING_CANCELLED = 'ListingCancelled';
     case LISTING_CREATED = 'ListingCreated';
     case LISTING_FILLED = 'ListingFilled';
+    case LISTING_REMOVED_UNDER_MINIMUM = 'ListingRemovedUnderMinimum';
 
     /**
      * Get the processor for the event.
@@ -31,6 +33,7 @@ enum MarketplaceEventType: string
             self::LISTING_CANCELLED => new ListingCancelled($event, $block, $codec),
             self::LISTING_CREATED => new ListingCreated($event, $block, $codec),
             self::LISTING_FILLED => new ListingFilled($event, $block, $codec),
+            self::LISTING_REMOVED_UNDER_MINIMUM => new ListingRemovedUnderMinimum($event, $block, $codec),
         };
     }
 }
