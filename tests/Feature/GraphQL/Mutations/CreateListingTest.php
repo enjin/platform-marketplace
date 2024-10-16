@@ -193,6 +193,23 @@ class CreateListingTest extends TestCaseGraphQL
         );
     }
 
+    public function test_it_will_fail_without_listing_data(): void
+    {
+        $data = $this->generateParams();
+        unset($data['listingData']);
+
+        $response = $this->graphql(
+            $this->method,
+            $data,
+            true
+        );
+
+        $this->assertEquals(
+            'Variable "$listingData" of required type "ListingDataInput!" was not provided.',
+            $response['error']
+        );
+    }
+
     public function test_it_will_fail_with_invalid_parameter_make_asset_id(): void
     {
         $data = $this->generateParams();
