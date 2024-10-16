@@ -58,7 +58,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PHP_COMMONS }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          composer install --no-interaction --prefer-dist --optimize-autoloader
+          composer install --no-interaction
+          composer install enjin/platform-core:dev-master
           composer build-sr25519
           composer dump-autoload
 
