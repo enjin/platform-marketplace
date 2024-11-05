@@ -21,7 +21,7 @@ class BidPlaced extends MarketplaceSubstrateEvent
     /**
      * Handles the bid placed event.
      */
-    public function run(): void
+    public function run(Event $event, \Enjin\Platform\Models\Laravel\Block $block, \Enjin\Platform\Services\Processor\Substrate\Codec\Codec $codec): void
     {
         try {
             // Fails if the listing is not found

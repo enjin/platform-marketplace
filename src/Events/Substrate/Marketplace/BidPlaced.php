@@ -4,12 +4,15 @@ namespace Enjin\Platform\Marketplace\Events\Substrate\Marketplace;
 
 use Enjin\Platform\Channels\PlatformAppChannel;
 use Enjin\Platform\Events\PlatformBroadcastEvent;
+use Enjin\Platform\Marketplace\Traits\HasCustomQueue;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Database\Eloquent\Model;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\BidPlaced as BidPlacedPolkadart;
 
 class BidPlaced extends PlatformBroadcastEvent
 {
+    use HasCustomQueue;
+
     /**
      * Create a new event instance.
      */

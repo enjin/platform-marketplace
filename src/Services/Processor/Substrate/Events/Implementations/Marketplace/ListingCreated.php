@@ -25,7 +25,7 @@ class ListingCreated extends MarketplaceSubstrateEvent
     /**
      * Handles the listing created event.
      */
-    public function run(): void
+    public function run(Event $event, \Enjin\Platform\Models\Laravel\Block $block, \Enjin\Platform\Services\Processor\Substrate\Codec\Codec $codec): void
     {
         if (!$this->shouldSyncCollection(Arr::get($this->event->makeAssetId, 'collection_id'))
             && !$this->shouldSyncCollection(Arr::get($this->event->takeAssetId, 'collection_id'))
