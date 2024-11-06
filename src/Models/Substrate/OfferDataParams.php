@@ -2,14 +2,13 @@
 
 namespace Enjin\Platform\Marketplace\Models\Substrate;
 
-class AuctionDataParams
+class OfferDataParams
 {
     /**
      * Create a new instance of the model.
      */
     public function __construct(
-        public int $startBlock,
-        public int $endBlock,
+        public ?int $expiration = null,
     ) {}
 
     /**
@@ -17,6 +16,8 @@ class AuctionDataParams
      */
     public function toEncodable(): array
     {
-        return ['startBlock' => $this->startBlock, 'endBlock' => $this->endBlock];
+        return [
+            'expiration' => $this->expiration,
+        ];
     }
 }

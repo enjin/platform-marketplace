@@ -4,7 +4,7 @@ namespace Enjin\Platform\Marketplace\GraphQL\Types;
 
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class FixedPriceDataType extends Type
+class OfferStateType extends Type
 {
     /**
      * Get the type's attributes.
@@ -13,8 +13,8 @@ class FixedPriceDataType extends Type
     public function attributes(): array
     {
         return [
-            'name' => 'FixedPriceData',
-            'description' => __('enjin-platform-marketplace::type.fixed_price_data.description'),
+            'name' => 'OfferState',
+            'description' => __('enjin-platform-marketplace::type.offer_state.description'),
         ];
     }
 
@@ -28,6 +28,11 @@ class FixedPriceDataType extends Type
             'type' => [
                 'type' => GraphQL::type('ListingType!'),
                 'description' => __('enjin-platform-marketplace::enum.listing_type.description'),
+            ],
+            'counterOfferCount' => [
+                'type' => GraphQL::type('Int!'),
+                'description' => __('enjin-platform-marketplace::type.offer_state.field.counterOfferCount'),
+                'alias' => 'counter_offer_count',
             ],
         ];
     }

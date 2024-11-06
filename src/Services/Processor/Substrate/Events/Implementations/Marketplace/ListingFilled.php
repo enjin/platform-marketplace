@@ -19,7 +19,8 @@ class ListingFilled extends MarketplaceSubstrateEvent
     /**
      * Handles the listing filled event.
      */
-    public function run(Event $event, \Enjin\Platform\Models\Laravel\Block $block, \Enjin\Platform\Services\Processor\Substrate\Codec\Codec $codec): void
+    #[\Override]
+    public function run(): void
     {
         try {
             // Fails to get the listing from the database
@@ -51,6 +52,7 @@ class ListingFilled extends MarketplaceSubstrateEvent
         }
     }
 
+    #[\Override]
     public function log(): void
     {
         Log::debug(
@@ -63,6 +65,7 @@ class ListingFilled extends MarketplaceSubstrateEvent
         );
     }
 
+    #[\Override]
     public function broadcast(): void
     {
         ListingFilledEvent::safeBroadcast(

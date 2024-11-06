@@ -19,21 +19,21 @@
         }
     ],
     "require": {
-        "php": "^8.2|^8.3",
+        "php": "^8.3",
         "ext-bcmath": "*",
         "ext-json": "*",
         "ext-openssl": "*",
         "ext-gmp": "*",
         "enjin/platform-core": "*",
-        "rebing/graphql-laravel": "^9.2",
+        "rebing/graphql-laravel": "^9.0",
         "spatie/laravel-package-tools": "^1.0",
         "spatie/laravel-ray": "^1.0",
         "phrity/websocket": "^1.0"
     },
     "require-dev": {
         "dms/phpunit-arraysubset-asserts": "dev-master",
-        "laravel/pint": "^1.15",
-        "nunomaduro/collision": "^8.1",
+        "laravel/pint": "^1.0",
+        "nunomaduro/collision": "^8.0",
         "larastan/larastan": "^2.0",
         "orchestra/testbench": "^9.0",
         "phpstan/extension-installer": "^1.0",
@@ -84,5 +84,5 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": false
+    "prefer-stable": true
 }

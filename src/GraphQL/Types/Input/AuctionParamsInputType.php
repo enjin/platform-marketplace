@@ -2,24 +2,27 @@
 
 namespace Enjin\Platform\Marketplace\GraphQL\Types\Input;
 
+use Enjin\Platform\Marketplace\GraphQL\Types\Type;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class AuctionDataInputType extends InputType
+class AuctionParamsInputType extends InputType
 {
     /**
-     * Get the input type's attributes.
+     * Get the type's attributes.
      */
+    #[\Override]
     public function attributes(): array
     {
         return [
-            'name' => 'AuctionDataInputType',
-            'description' => __('enjin-platform-marketplace::input_type.auction_data.description'),
+            'name' => 'AuctionParamsInput',
+            'description' => __('enjin-platform-marketplace::type.auction_data.description'),
         ];
     }
 
     /**
-     * Get the input type's fields.
+     * Get the type's fields.
      */
+    #[\Override]
     public function fields(): array
     {
         return [

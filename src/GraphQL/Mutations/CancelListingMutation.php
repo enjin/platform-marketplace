@@ -33,6 +33,7 @@ class CancelListingMutation extends Mutation implements PlatformBlockchainTransa
     /**
      * Get the mutation's attributes.
      */
+    #[\Override]
     public function attributes(): array
     {
         return [
@@ -44,6 +45,7 @@ class CancelListingMutation extends Mutation implements PlatformBlockchainTransa
     /**
      * Get the mutation's return type.
      */
+    #[\Override]
     public function type(): Type
     {
         return GraphQL::type('Transaction!');
@@ -52,6 +54,7 @@ class CancelListingMutation extends Mutation implements PlatformBlockchainTransa
     /**
      * Get the mutation's arguments definition.
      */
+    #[\Override]
     public function args(): array
     {
         return [
@@ -84,6 +87,7 @@ class CancelListingMutation extends Mutation implements PlatformBlockchainTransa
         );
     }
 
+    #[\Override]
     public static function getEncodableParams(...$params): array
     {
         return [

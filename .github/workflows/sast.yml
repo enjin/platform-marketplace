@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        php: [8.2]
+        php: [8.3]
 
     name: PHP ${{ matrix.php }}
 
@@ -50,9 +50,21 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer install --no-interaction --no-progress
-          composer dump-autoload      
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PHP_COMMONS }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          composer install --no-interaction --prefer-dist --no-autoloader --no-dev --no-scripts
+
+      - name: Update packages
+        run: |
+          composer require enjin/platform-core:dev-master --no-update
+          composer update --no-interaction --optimize-autoloader
+          composer build-sr25519
 
       - name: Run Rector
         run: |
           ./vendor/bin/rector process --dry-run
+
+      - name: Run Laravel Pint
+        run: |
+          ./vendor/bin/pint --test

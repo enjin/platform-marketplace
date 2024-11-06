@@ -10,4 +10,6 @@ enum ListingType: string
 
     case FIXED_PRICE = 'FixedPrice';
     case AUCTION = 'Auction';
+
+    case OFFER = 'Offer';
 }

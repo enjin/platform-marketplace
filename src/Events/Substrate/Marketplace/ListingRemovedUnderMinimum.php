@@ -4,19 +4,16 @@ namespace Enjin\Platform\Marketplace\Events\Substrate\Marketplace;
 
 use Enjin\Platform\Channels\PlatformAppChannel;
 use Enjin\Platform\Events\PlatformBroadcastEvent;
-use Enjin\Platform\Marketplace\Traits\HasCustomQueue;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Database\Eloquent\Model;
-use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\ListingCancelled as ListingCancelledPolkadart;
+use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\ListingRemovedUnderMinimum as ListingRemovedUnderMinimumPolkadart;
 
-class ListingCancelled extends PlatformBroadcastEvent
+class ListingRemovedUnderMinimum extends PlatformBroadcastEvent
 {
-    use HasCustomQueue;
-
     /**
      * Create a new event instance.
      */
-    public function __construct(ListingCancelledPolkadart $event, ?Model $transaction = null, ?array $extra = null)
+    public function __construct(ListingRemovedUnderMinimumPolkadart $event, ?Model $transaction = null, ?array $extra = null)
     {
         parent::__construct();
 

@@ -36,6 +36,7 @@ abstract class Mutation extends GraphQlMutation implements PlatformGraphQlMutati
     /**
      * Get validation rules.
      */
+    #[\Override]
     public function getRules(array $arguments = []): array
     {
         return collect(parent::getRules($arguments))->mergeRecursive(static::$adhocRules)->all();

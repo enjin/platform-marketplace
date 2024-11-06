@@ -21,7 +21,8 @@ class BidPlaced extends MarketplaceSubstrateEvent
     /**
      * Handles the bid placed event.
      */
-    public function run(Event $event, \Enjin\Platform\Models\Laravel\Block $block, \Enjin\Platform\Services\Processor\Substrate\Codec\Codec $codec): void
+    #[\Override]
+    public function run(): void
     {
         try {
             // Fails if the listing is not found
@@ -53,6 +54,7 @@ class BidPlaced extends MarketplaceSubstrateEvent
         }
     }
 
+    #[\Override]
     public function log(): void
     {
         Log::debug(
@@ -64,6 +66,7 @@ class BidPlaced extends MarketplaceSubstrateEvent
         );
     }
 
+    #[\Override]
     public function broadcast(): void
     {
         BidPlacedEvent::safeBroadcast(

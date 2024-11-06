@@ -13,6 +13,7 @@ class ListingStateUnion extends UnionType implements PlatformGraphQlUnion
     /**
      * Get the type's attributes.
      */
+    #[\Override]
     public function attributes(): array
     {
         return [
@@ -24,11 +25,13 @@ class ListingStateUnion extends UnionType implements PlatformGraphQlUnion
     /**
      * The possible types that this union can be.
      */
+    #[\Override]
     public function types(): array
     {
         return [
             GraphQL::type('FixedPriceState'),
             GraphQL::type('AuctionState'),
+            GraphQL::type('OfferState'),
         ];
     }
 
@@ -40,6 +43,7 @@ class ListingStateUnion extends UnionType implements PlatformGraphQlUnion
         return match ($objectValue?->type) {
             ListingType::FIXED_PRICE->name => GraphQL::type('FixedPriceState'),
             ListingType::AUCTION->name => GraphQL::type('AuctionState'),
+            ListingType::OFFER->name => GraphQL::type('OfferState'),
             default => null,
         };
     }

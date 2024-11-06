@@ -4,24 +4,21 @@ namespace Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Impleme
 
 use Carbon\Carbon;
 use Enjin\Platform\Marketplace\Enums\ListingState;
-use Enjin\Platform\Marketplace\Events\Substrate\Marketplace\AuctionFinalized as AuctionFinalizedEvent;
+use Enjin\Platform\Marketplace\Events\Substrate\Marketplace\ListingRemovedUnderMinimum as ListingRemovedUnderMinimumEvent;
 use Enjin\Platform\Marketplace\Models\Laravel\Wallet;
-use Enjin\Platform\Marketplace\Models\MarketplaceSale;
 use Enjin\Platform\Marketplace\Models\MarketplaceState;
 use Enjin\Platform\Marketplace\Services\Processor\Substrate\Events\Implementations\MarketplaceSubstrateEvent;
-use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\AuctionFinalized as AuctionFinalizedPolkadart;
+use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Marketplace\ListingRemovedUnderMinimum as ListingRemovedUnderMinimumPolkadart;
 use Enjin\Platform\Services\Processor\Substrate\Codec\Polkadart\Events\Event;
 use Illuminate\Support\Facades\Log;
 
-class AuctionFinalized extends MarketplaceSubstrateEvent
+class ListingRemovedUnderMinimum extends MarketplaceSubstrateEvent
 {
-    /** @var AuctionFinalizedPolkadart */
+    /** @var ListingRemovedUnderMinimumPolkadart */
     protected Event $event;
 
-    protected ?MarketplaceSale $saleCreated = null;
-
     /**
-     * Handles the auction finalized event.
+     * Handles the listing cancelled event.
      */
     #[\Override]
     public function run(): void
@@ -29,34 +26,25 @@ class AuctionFinalized extends MarketplaceSubstrateEvent
         try {
             // Fails if the listing is not found
             $listing = $this->getListing($this->event->listingId);
-            $bidder = $this->firstOrStoreAccount($this->event->winningBidder);
             $seller = Wallet::find($listing->seller_wallet_id);
 
             MarketplaceState::create([
                 'marketplace_listing_id' => $listing->id,
-                'state' => ListingState::FINALIZED->name,
+                'state' => ListingState::CANCELLED->name,
                 'height' => $this->block->number,
                 'created_at' => $now = Carbon::now(),
                 'updated_at' => $now,
             ]);
 
-            $this->saleCreated = MarketplaceSale::create([
-                'listing_chain_id' => $listing->listing_chain_id,
-                'wallet_id' => $bidder->id,
-                'price' => $this->event->price,
-                'amount' => $listing->amount,
-            ]);
-
             $this->extra = [
                 'collection_id' => $listing->make_collection_chain_id,
                 'token_id' => $listing->make_token_chain_id,
-                'bidder' => $bidder->public_key,
                 'seller' => $seller->public_key,
             ];
         } catch (\Throwable) {
             Log::error(
                 sprintf(
-                    'Listing %s was finalized but could not be found in the database.',
+                    'Listing %s was removed but could not be found in the database.',
                     $this->event->listingId,
                 )
             );
@@ -68,22 +56,19 @@ class AuctionFinalized extends MarketplaceSubstrateEvent
     {
         Log::debug(
             sprintf(
-                'Listing %s was finalized with a sale from %s.',
+                'Listing %s was removed because of royalties change.',
                 $this->event->listingId,
-                $this->event->winningBidder,
             )
         );
-
     }
 
     #[\Override]
     public function broadcast(): void
     {
-        AuctionFinalizedEvent::safeBroadcast(
+        ListingRemovedUnderMinimumEvent::safeBroadcast(
             $this->event,
             $this->getTransaction($this->block, $this->event->extrinsicIndex),
             $this->extra,
-            $this->saleCreated,
         );
     }
 }

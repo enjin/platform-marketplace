@@ -4,8 +4,9 @@ namespace Enjin\Platform\Marketplace\Tests\Feature\GraphQL\Mutations;
 
 use Enjin\Platform\Facades\TransactionSerializer;
 use Enjin\Platform\GraphQL\Schemas\Primary\Substrate\Traits\HasEncodableTokenId;
+use Enjin\Platform\Marketplace\Enums\ListingType;
 use Enjin\Platform\Marketplace\GraphQL\Mutations\CreateListingMutation;
-use Enjin\Platform\Marketplace\Models\Substrate\AuctionDataParams;
+use Enjin\Platform\Marketplace\Models\Substrate\ListingDataParams;
 use Enjin\Platform\Marketplace\Models\Substrate\MultiTokensTokenAssetIdParams;
 use Enjin\Platform\Marketplace\Tests\Feature\GraphQL\TestCaseGraphQL;
 use Enjin\Platform\Models\Block;
@@ -26,13 +27,14 @@ class CreateListingTest extends TestCaseGraphQL
     /**
      * Setup test case.
      */
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
         Block::updateOrCreate(['number' => 1000]);
     }
 
-    public function test_it_can_create_listing(): void
+    public function test_it_can_create_listing_auction(): void
     {
         $response = $this->graphql(
             $this->method,
@@ -47,9 +49,61 @@ class CreateListingTest extends TestCaseGraphQL
             Arr::get($params, 'takeAssetId.collectionId'),
             $this->encodeTokenId(Arr::get($params, 'takeAssetId'))
         );
-        $params['auctionData'] = (Arr::get($params, 'auctionData'))
-            ? new AuctionDataParams(Arr::get($params, 'auctionData.startBlock'), Arr::get($params, 'auctionData.endBlock'))
-            : null;
+
+        $this->assertEquals(
+            $response['encodedData'],
+            TransactionSerializer::encode($this->method, CreateListingMutation::getEncodableParams(...$params))
+        );
+
+        $this->assertNull(Arr::get($response, 'wallet.account.publicKey'));
+    }
+
+    public function test_it_can_create_listing_fixed_price(): void
+    {
+        $params = $this->generateParams();
+        $params['listingData'] = [
+            'type' => ListingType::FIXED_PRICE->name,
+        ];
+
+        $response = $this->graphql($this->method, $params);
+
+        $params['makeAssetId'] = new MultiTokensTokenAssetIdParams(
+            Arr::get($params, 'makeAssetId.collectionId'),
+            $this->encodeTokenId(Arr::get($params, 'makeAssetId'))
+        );
+        $params['takeAssetId'] = new MultiTokensTokenAssetIdParams(
+            Arr::get($params, 'takeAssetId.collectionId'),
+            $this->encodeTokenId(Arr::get($params, 'takeAssetId'))
+        );
+
+        $this->assertEquals(
+            $response['encodedData'],
+            TransactionSerializer::encode($this->method, CreateListingMutation::getEncodableParams(...$params))
+        );
+
+        $this->assertNull(Arr::get($response, 'wallet.account.publicKey'));
+    }
+
+    public function test_it_can_create_listing_offer(): void
+    {
+        $params = $this->generateParams();
+        $params['listingData'] = [
+            'type' => ListingType::OFFER->name,
+            'offerParams' => [
+                'expiration' => 50000,
+            ],
+        ];
+
+        $response = $this->graphql($this->method, $params);
+
+        $params['makeAssetId'] = new MultiTokensTokenAssetIdParams(
+            Arr::get($params, 'makeAssetId.collectionId'),
+            $this->encodeTokenId(Arr::get($params, 'makeAssetId'))
+        );
+        $params['takeAssetId'] = new MultiTokensTokenAssetIdParams(
+            Arr::get($params, 'takeAssetId.collectionId'),
+            $this->encodeTokenId(Arr::get($params, 'takeAssetId'))
+        );
 
         $this->assertEquals(
             $response['encodedData'],
@@ -75,9 +129,12 @@ class CreateListingTest extends TestCaseGraphQL
                 'amount' => fake()->numberBetween(1, 1000),
                 'price' => fake()->numberBetween(1, 1000),
                 'salt' => fake()->text(10),
-                'auctionData' => [
-                    'startBlock' => fake()->numberBetween(1011, 5000),
-                    'endBlock' => fake()->numberBetween(5001, 10000),
+                'listingData' => [
+                    'type' => ListingType::AUCTION->name,
+                    'auctionParams' => [
+                        'startBlock' => fake()->numberBetween(1011, 5000),
+                        'endBlock' => fake()->numberBetween(5001, 10000),
+                    ],
                 ],
                 'skipValidation' => true,
             ]
@@ -92,7 +149,7 @@ class CreateListingTest extends TestCaseGraphQL
             $this->encodeTokenId(Arr::get($params, 'takeAssetId'))
         );
         $params['auctionData'] = (Arr::get($params, 'auctionData'))
-            ? new AuctionDataParams(Arr::get($params, 'auctionData.startBlock'), Arr::get($params, 'auctionData.endBlock'))
+            ? new ListingDataParams(Arr::get($params, 'auctionData.startBlock'), Arr::get($params, 'auctionData.endBlock'))
             : null;
 
         $this->assertEquals(
@@ -122,7 +179,7 @@ class CreateListingTest extends TestCaseGraphQL
             $this->encodeTokenId(Arr::get($params, 'takeAssetId'))
         );
         $params['auctionData'] = ($data = Arr::get($params, 'auctionData'))
-            ? new AuctionDataParams(Arr::get($params, 'auctionData.startBlock'), Arr::get($params, 'auctionData.endBlock'))
+            ? new ListingDataParams(Arr::get($params, 'auctionData.startBlock'), Arr::get($params, 'auctionData.endBlock'))
             : null;
 
         $this->assertEquals(
@@ -133,6 +190,23 @@ class CreateListingTest extends TestCaseGraphQL
         $this->assertEquals(
             Arr::get($response, 'wallet.account.publicKey'),
             $params['signingAccount'],
+        );
+    }
+
+    public function test_it_will_fail_without_listing_data(): void
+    {
+        $data = $this->generateParams();
+        unset($data['listingData']);
+
+        $response = $this->graphql(
+            $this->method,
+            $data,
+            true
+        );
+
+        $this->assertEquals(
+            'Variable "$listingData" of required type "ListingDataInput!" was not provided.',
+            $response['error']
         );
     }
 
@@ -374,79 +448,95 @@ class CreateListingTest extends TestCaseGraphQL
         $data = $this->generateParams();
         $response = $this->graphql(
             $this->method,
-            array_merge($data, ['auctionData' => null]),
-            true
-        );
-        $this->assertNotEmpty($response['data']);
-
-        $response = $this->graphql(
-            $this->method,
-            array_merge($data, ['auctionData' => [
-                'startBlock' => fake()->numberBetween(1011, 2000),
-                'endBlock' => null,
-            ]]),
+            array_merge($data, ['listingData' => null]),
             true
         );
         $this->assertStringContainsString(
-            'Variable "$auctionData" got invalid value null at "auctionData.endBlock"; Expected non-nullable type "Int!" not to be null.',
+            'Variable "$listingData" of non-null type "ListingDataInput!" must not be null.',
             $response['error']
         );
 
         $response = $this->graphql(
             $this->method,
-            array_merge($data, ['auctionData' => [
-                'startBlock' => null,
-                'endBlock' => fake()->numberBetween(1011, 2000),
+            array_merge($data, ['listingData' => [
+                'type' => ListingType::AUCTION->name,
+                'auctionParams' => ['startBlock' => fake()->numberBetween(1011, 5000)],
             ]]),
             true
         );
         $this->assertStringContainsString(
-            'Variable "$auctionData" got invalid value null at "auctionData.startBlock"; Expected non-nullable type "Int!" not to be null.',
+            'Field "endBlock" of required type "Int!" was not provided',
             $response['error']
         );
 
         $response = $this->graphql(
             $this->method,
-            array_merge($data, ['auctionData' => [
-                'startBlock' => Hex::MAX_UINT128 + 1,
-                'endBlock' => Hex::MAX_UINT128 + 1,
+            array_merge($data, ['listingData' => [
+                'type' => ListingType::AUCTION->name,
+                'auctionParams' => [
+                    'startBlock' => null,
+                    'endBlock' => fake()->numberBetween(1011, 2000),
+                ],
             ]]),
             true
         );
         $this->assertStringContainsString(
-            'Variable "$auctionData" got invalid value 3.4028236692094E+38 at "auctionData.startBlock"; Int cannot represent non 32-bit signed integer value: 3.4028236692094E+38',
+            'invalid value null at "listingData.auctionParams.startBlock"',
+            $response['error']
+        );
+
+        $response = $this->graphql(
+            $this->method,
+            array_merge($data, ['listingData' => [
+                'type' => ListingType::AUCTION->name,
+                'auctionParams' => [
+                    'startBlock' => Hex::MAX_UINT128 + 1,
+                    'endBlock' => Hex::MAX_UINT128 + 1,
+                ],
+            ]]),
+            true
+        );
+        $this->assertStringContainsString(
+            '"listingData.auctionParams.startBlock"; Int cannot represent non',
             $response['errors'][0]['message']
         );
         $this->assertStringContainsString(
-            'Variable "$auctionData" got invalid value 3.4028236692094E+38 at "auctionData.endBlock"; Int cannot represent non 32-bit signed integer value: 3.4028236692094E+38',
+            '"listingData.auctionParams.endBlock"; Int cannot represent non',
             $response['errors'][1]['message']
         );
 
         $response = $this->graphql(
             $this->method,
-            array_merge($data, ['auctionData' => [
-                'startBlock' => 1,
-                'endBlock' => 2,
+            array_merge($data, ['listingData' => [
+                'type' => ListingType::AUCTION->name,
+                'auctionParams' => [
+                    'startBlock' => 1,
+                    'endBlock' => 2,
+                ],
             ]]),
             true
         );
         $this->assertArraySubset(
-            ['auctionData.startBlock' => ['The auction data.start block must be at least 1010.']],
+            ['listingData.auctionParams.startBlock' => ['The listing data.auction params.start block must be at least 1010.']],
             $response['error']
         );
 
         $response = $this->graphql(
             $this->method,
-            array_merge($data, ['auctionData' => [
-                'startBlock' => 1012,
-                'endBlock' => 1011,
+            array_merge($data, ['listingData' => [
+                'type' => ListingType::AUCTION->name,
+                'auctionParams' => [
+                    'startBlock' => 1012,
+                    'endBlock' => 1011,
+                ],
             ]]),
             true
         );
         $this->assertArraySubset(
             [
-                'auctionData.startBlock' => ['The auction data.start block field must be less than or equal to 1011.'],
-                'auctionData.endBlock' => ['The auction data.end block field must be greater than 1012.'],
+                'listingData.auctionParams.endBlock' => [
+                    'The listing data.auction params.end block field must be greater than 1012.',
+                ],
             ],
             $response['error']
         );

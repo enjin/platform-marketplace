@@ -18,6 +18,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * The package providers.
      */
+    #[\Override]
     protected function getPackageProviders($app)
     {
         return [
@@ -29,6 +30,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Define environment.
      */
+    #[\Override]
     protected function defineEnvironment($app)
     {
         // Make sure, our .env file is loaded for local tests

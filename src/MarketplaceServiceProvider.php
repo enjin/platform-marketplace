@@ -13,6 +13,7 @@ class MarketplaceServiceProvider extends PackageServiceProvider
     /**
      * Configure provider.
      */
+    #[\Override]
     public function configurePackage(Package $package): void
     {
         $package
@@ -25,6 +26,7 @@ class MarketplaceServiceProvider extends PackageServiceProvider
             ->hasMigration('add_listing_id_to_marketplace_sales_table')
             ->hasMigration('drop_market_place_listing_id_in_marketplace_sales_table')
             ->hasMigration('nullable_listing_on_marketplace_sales_table')
+            ->hasMigration('new_listing_type_to_marketplace_listings_table')
             ->hasTranslations();
     }
 
@@ -33,6 +35,7 @@ class MarketplaceServiceProvider extends PackageServiceProvider
      *
      * @return void
      */
+    #[\Override]
     public function register()
     {
         if (app()->runningUnitTests()) {
@@ -49,12 +52,14 @@ class MarketplaceServiceProvider extends PackageServiceProvider
      *
      * @return void
      */
+    #[\Override]
     public function boot()
     {
         parent::boot();
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
     }
 
+    #[\Override]
     public function packageRegistered()
     {
         $this->loadTranslationsFrom(__DIR__ . '/../lang', 'enjin-platform-marketplace');

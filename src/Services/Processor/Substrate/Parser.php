@@ -4,6 +4,7 @@ namespace Enjin\Platform\Marketplace\Services\Processor\Substrate;
 
 use Closure;
 use Enjin\Platform\Marketplace\Enums\ListingState;
+use Enjin\Platform\Marketplace\Enums\ListingType;
 use Enjin\Platform\Marketplace\Models\MarketplaceBid;
 use Enjin\Platform\Marketplace\Models\MarketplaceListing;
 use Enjin\Platform\Marketplace\Models\MarketplaceState;
@@ -85,9 +86,11 @@ class Parser extends BaseParser
                 'creation_block' => $creationBlock,
                 'deposit' => Arr::get($listingData, 'deposit'),
                 'salt' => Arr::get($listingData, 'salt'),
-                'type' => Arr::exists($listingData, 'data.Auction') ? 'AUCTION' : 'FIXED_PRICE',
-                'start_block' => Arr::get($listingData, 'data.Auction.startBlock'),
-                'end_block' => Arr::get($listingData, 'data.Auction.endBlock'),
+                'type' => ListingType::tryFrom(array_key_first(Arr::get($listingData, 'data'))),
+                'auction_start_block' => Arr::get($listingData, 'data.Auction.startBlock'),
+                'auction_end_block' => Arr::get($listingData, 'data.Auction.endBlock'),
+                'offer_expiration' => Arr::get($listingData, 'data.Offer.expiration'),
+                'counter_offer_count' => ($counterOfferCount = Arr::get($listingData, 'state.Offer.counterOfferCount')) !== null ? gmp_strval($counterOfferCount) : null,
                 'amount_filled' => ($amountFilled = Arr::get($listingData, 'state.FixedPrice.amountFilled')) !== null ? gmp_strval($amountFilled) : null,
             ];
         }
