@@ -92,7 +92,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 'description' => __('enjin-platform-marketplace::type.marketplace_listing.field.salt'),
             ],
             'listingData' => [
-                'type' => GraphQL::type('ListingDataInput'),
+                'type' => GraphQL::type('ListingDataInput!'),
                 'description' => __('enjin-platform-marketplace::mutation.create_listing.args.listingData'),
             ],
             ...$this->getSigningAccountField(),

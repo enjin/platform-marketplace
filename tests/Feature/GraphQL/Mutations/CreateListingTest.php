@@ -456,6 +456,17 @@ class CreateListingTest extends TestCaseGraphQL
             $response['error']
         );
 
+        unset($data['listingData']);
+        $response = $this->graphql(
+            $this->method,
+            $data,
+            true
+        );
+        $this->assertStringContainsString(
+            'Variable "$listingData" of required type "ListingDataInput!" was not provided.',
+            $response['error']
+        );
+
         $response = $this->graphql(
             $this->method,
             array_merge($data, ['listingData' => [
