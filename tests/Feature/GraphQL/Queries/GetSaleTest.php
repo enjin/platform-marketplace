@@ -43,7 +43,7 @@ class GetSaleTest extends TestCaseGraphQL
     public function test_it_will_fail_with_invalid_parameter_id(): void
     {
         $response = $this->graphql($this->method, ['id' => 0], true);
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['id' => ['The selected id is invalid.']],
             $response['error']
         );

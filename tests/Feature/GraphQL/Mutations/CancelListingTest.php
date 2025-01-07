@@ -59,7 +59,7 @@ class CancelListingTest extends TestCaseGraphQL
             ['listingId' => ''],
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingId' => ['The listing id field must have a value.']],
             $response['error']
         );
@@ -69,7 +69,7 @@ class CancelListingTest extends TestCaseGraphQL
             ['listingId' => Str::random(300)],
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingId' => ['The listing id field must not be greater than 255 characters.']],
             $response['error']
         );
@@ -79,7 +79,7 @@ class CancelListingTest extends TestCaseGraphQL
             ['listingId' => Str::random(255)],
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingId' => ['The selected listing id is invalid.']],
             $response['error']
         );
@@ -94,7 +94,7 @@ class CancelListingTest extends TestCaseGraphQL
             ['listingId' => $listing->listing_chain_id],
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingId' => ['The listing is already cancelled.']],
             $response['error']
         );

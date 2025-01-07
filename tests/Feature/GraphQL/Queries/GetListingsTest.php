@@ -71,7 +71,7 @@ class GetListingsTest extends TestCaseGraphQL
             ['ids' => Collection::range(1, 1001)->toArray()],
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['ids' => ['The ids field must not have more than 1000 items.']],
             $response['error']
         );
@@ -91,7 +91,7 @@ class GetListingsTest extends TestCaseGraphQL
             ['ids' => [1], 'listingIds' => ['test']],
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             [
                 'ids' => ['The ids field prohibits listing ids from being present.'],
                 'listingIds' => ['The listing ids field prohibits ids from being present.'],
@@ -107,7 +107,7 @@ class GetListingsTest extends TestCaseGraphQL
             ['listingIds' => Collection::range(1, 1001)->map(fn ($val) => (string) $val)->toArray()],
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingIds' => ['The listing ids field must not have more than 1000 items.']],
             $response['error']
         );
@@ -117,7 +117,7 @@ class GetListingsTest extends TestCaseGraphQL
             ['listingIds' => [Str::random(256)]],
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingIds.0' => ['The listingIds.0 field must not be greater than 255 characters.']],
             $response['error']
         );
@@ -130,7 +130,7 @@ class GetListingsTest extends TestCaseGraphQL
             ['account' => Str::random(300)],
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['account' => ['The account field must not be greater than 255 characters.']],
             $response['error']
         );
@@ -140,7 +140,7 @@ class GetListingsTest extends TestCaseGraphQL
             ['account' => Str::random(255)],
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['account' => ['The account is not a valid substrate address.']],
             $response['error']
         );

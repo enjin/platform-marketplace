@@ -32,13 +32,13 @@ class GetListingTest extends TestCaseGraphQL
     public function test_it_will_fail_with_invalid_parameter_id(): void
     {
         $response = $this->graphql($this->method, ['id' => 0], true);
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['id' => ['The selected id is invalid.']],
             $response['error']
         );
 
         $response = $this->graphql($this->method, ['id' => null, 'listingId' => null], true);
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             [
                 'id' => ['The id field is required when listing id is not present.'],
                 'listingId' => ['The listing id field is required when id is not present.'],
@@ -56,13 +56,13 @@ class GetListingTest extends TestCaseGraphQL
     public function test_it_will_fail_with_invalid_parameter_listing_id(): void
     {
         $response = $this->graphql($this->method, ['listingId' => fake()->text(255)], true);
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingId' => ['The selected listing id is invalid.']],
             $response['error']
         );
 
         $response = $this->graphql($this->method, ['listingId' => Str::random(256)], true);
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingId' => ['The listing id field must not be greater than 255 characters.']],
             $response['error']
         );

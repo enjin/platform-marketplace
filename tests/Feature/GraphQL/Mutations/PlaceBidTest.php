@@ -68,7 +68,7 @@ class PlaceBidTest extends TestCaseGraphQL
             array_merge($data, ['listingId' => '']),
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingId' => ['The listing id field must have a value.']],
             $response['error']
         );
@@ -78,7 +78,7 @@ class PlaceBidTest extends TestCaseGraphQL
             array_merge($data, ['listingId' => Str::random(300)]),
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingId' => ['The listing id field must not be greater than 255 characters.']],
             $response['error']
         );
@@ -88,7 +88,7 @@ class PlaceBidTest extends TestCaseGraphQL
             array_merge($data, ['listingId' => Str::random(255)]),
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingId' => ['The selected listing id is invalid.']],
             $response['error']
         );
@@ -136,7 +136,7 @@ class PlaceBidTest extends TestCaseGraphQL
             true
         );
         $expected = bcmul($price, 1.05);
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['price' => ["The minimum bidding price must be greater than or equal to {$expected}."]],
             $response['error']
         );
@@ -149,7 +149,7 @@ class PlaceBidTest extends TestCaseGraphQL
             true
         );
         $expected = bcmul($price, 1.05);
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['price' => ["The minimum bidding price must be greater than or equal to {$expected}."]],
             $response['error']
         );
@@ -163,7 +163,7 @@ class PlaceBidTest extends TestCaseGraphQL
             $data,
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingId' => ['The listing is already cancelled.']],
             $response['error']
         );

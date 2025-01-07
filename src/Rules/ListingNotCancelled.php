@@ -12,7 +12,7 @@ class ListingNotCancelled implements ValidationRule
     /**
      * Run the validation rule.
      *
-     * @param  \Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
+     * @param  Closure(string): \Illuminate\Translation\PotentiallyTranslatedString  $fail
      */
     #[\Override]
     public function validate(string $attribute, mixed $value, Closure $fail): void
