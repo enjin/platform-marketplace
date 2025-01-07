@@ -44,7 +44,7 @@ class GetSalesTest extends TestCaseGraphQL
             ['accounts' => [Str::random(300)]],
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['accounts.0' => ['The accounts.0 field must not be greater than 255 characters.']],
             $response['error']
         );
@@ -54,7 +54,7 @@ class GetSalesTest extends TestCaseGraphQL
             ['accounts' => [Str::random(255)]],
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['accounts.0' => ['The accounts.0 is not a valid substrate address.']],
             $response['error']
         );
@@ -65,7 +65,7 @@ class GetSalesTest extends TestCaseGraphQL
             ['accounts' => Collection::range(1, 1001)->map(fn ($val) => $provider->public_key())->toArray()],
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['accounts' => ['The accounts field must not have more than 1000 items.']],
             $response['error']
         );
@@ -78,7 +78,7 @@ class GetSalesTest extends TestCaseGraphQL
             ['listingIds' => [Str::random(300)]],
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingIds.0' => ['The listingIds.0 field must not be greater than 255 characters.']],
             $response['error']
         );
@@ -88,7 +88,7 @@ class GetSalesTest extends TestCaseGraphQL
             ['listingIds' => Collection::range(1, 1001)->map(fn ($val) => (string) $val)->toArray()],
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingIds' => ['The listing ids field must not have more than 1000 items.']],
             $response['error']
         );
@@ -111,7 +111,7 @@ class GetSalesTest extends TestCaseGraphQL
             ['ids' => Collection::range(1, 1001)->toArray()],
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['ids' => ['The ids field must not have more than 1000 items.']],
             $response['error']
         );

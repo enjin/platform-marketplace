@@ -62,7 +62,7 @@ class FillListingTest extends TestCaseGraphQL
             array_merge($data, ['listingId' => '']),
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingId' => ['The listing id field must have a value.']],
             $response['error']
         );
@@ -72,7 +72,7 @@ class FillListingTest extends TestCaseGraphQL
             array_merge($data, ['listingId' => Str::random(300)]),
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingId' => ['The listing id field must not be greater than 255 characters.']],
             $response['error']
         );
@@ -82,7 +82,7 @@ class FillListingTest extends TestCaseGraphQL
             array_merge($data, ['listingId' => Str::random(255)]),
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingId' => ['The selected listing id is invalid.']],
             $response['error']
         );
@@ -96,7 +96,7 @@ class FillListingTest extends TestCaseGraphQL
             $data,
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingId' => ['The listing is already cancelled.']],
             $response['error']
         );

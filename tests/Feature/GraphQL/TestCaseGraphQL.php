@@ -2,7 +2,6 @@
 
 namespace Enjin\Platform\Marketplace\Tests\Feature\GraphQL;
 
-use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Enjin\Platform\CoreServiceProvider;
 use Enjin\Platform\Marketplace\Enums\ListingState;
 use Enjin\Platform\Marketplace\MarketplaceServiceProvider;
@@ -12,19 +11,18 @@ use Enjin\Platform\MarketPlace\Models\MarketplaceSale;
 use Enjin\Platform\MarketPlace\Models\MarketplaceState;
 use Enjin\Platform\Marketplace\Tests\Feature\GraphQL\Traits\CreateCollectionData;
 use Enjin\Platform\Marketplace\Tests\Feature\GraphQL\Traits\CreateListingParameters;
+use Enjin\Platform\Marketplace\Tests\TestCase;
 use Enjin\Platform\Models\Collection as LaravelCollection;
 use Enjin\Platform\Models\Token;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
-use Orchestra\Testbench\TestCase as BaseTestCase;
 use PHPUnit\Framework\ExpectationFailedException;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
-class TestCaseGraphQL extends BaseTestCase
+class TestCaseGraphQL extends TestCase
 {
-    use ArraySubsetAsserts;
     use CreateCollectionData;
     use CreateListingParameters;
 

@@ -243,7 +243,7 @@ class CreateListingTest extends TestCaseGraphQL
             ]),
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             [
                 'makeAssetId.collectionId' => ['The selected make asset id.collection id is invalid.'],
             ],
@@ -303,7 +303,7 @@ class CreateListingTest extends TestCaseGraphQL
             ]),
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             [
                 'takeAssetId.collectionId' => ['The selected take asset id.collection id is invalid.'],
                 'takeAssetId' => ['The take asset id does not exist in the specified collection.'],
@@ -369,7 +369,7 @@ class CreateListingTest extends TestCaseGraphQL
             array_merge($data, ['amount' => $this->token->supply + 1]),
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['amount' => ['The token supply is not enough.']],
             $response['error']
         );
@@ -427,7 +427,7 @@ class CreateListingTest extends TestCaseGraphQL
             array_merge($data, ['salt' => '']),
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['salt' => ['The salt field must have a value.']],
             $response['error']
         );
@@ -437,7 +437,7 @@ class CreateListingTest extends TestCaseGraphQL
             array_merge($data, ['salt' => Str::random(300)]),
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['salt' => ['The salt field must not be greater than 255 characters.']],
             $response['error']
         );
@@ -527,7 +527,7 @@ class CreateListingTest extends TestCaseGraphQL
             ]]),
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             ['listingData.auctionParams.startBlock' => ['The listing data.auction params.start block must be at least 1010.']],
             $response['error']
         );
@@ -543,7 +543,7 @@ class CreateListingTest extends TestCaseGraphQL
             ]]),
             true
         );
-        $this->assertArraySubset(
+        $this->assertArrayContainsArray(
             [
                 'listingData.auctionParams.endBlock' => [
                     'The listing data.auction params.end block field must be greater than 1012.',
