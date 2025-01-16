@@ -86,7 +86,7 @@ class Parser extends BaseParser
                 'creation_block' => $creationBlock,
                 'deposit' => Arr::get($listingData, 'deposit'),
                 'salt' => Arr::get($listingData, 'salt'),
-                'type' => ListingType::tryFrom(array_key_first(Arr::get($listingData, 'data'))),
+                'type' => ListingType::tryFrom(array_key_first(Arr::get($listingData, 'data')))->name,
                 'auction_start_block' => Arr::get($listingData, 'data.Auction.startBlock'),
                 'auction_end_block' => Arr::get($listingData, 'data.Auction.endBlock'),
                 'offer_expiration' => Arr::get($listingData, 'data.Offer.expiration'),
