@@ -27,8 +27,9 @@ class AuctionParamsInputType extends InputType
     {
         return [
             'startBlock' => [
-                'type' => GraphQL::type('Int!'),
+                'type' => GraphQL::type('Int'),
                 'description' => __('enjin-platform-marketplace::type.auction_data.field.startBlock'),
+                'deprecationReason' => __('enjin-platform-marketplace::deprecated.auction_data.field.startBlock'),
             ],
             'endBlock' => [
                 'type' => GraphQL::type('Int!'),

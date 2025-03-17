@@ -24,7 +24,7 @@ return [
     'auction_state.description' => 'State of an auction listing.',
     'auction_state.field.highestBid' => 'The highest bid.',
     'auction_data.description' => 'Immutable data specifically for an auction.',
-    'auction_data.field.startBlock' => 'The block number the auction starts at.',
+    'auction_data.field.startBlock' => '(DEPRECATED) The block number the auction starts at. Use the field startBlock instead.',
     'auction_data.field.endBlock' => 'The block number the auction ends at.',
     'marketplace_bid.description' => 'The auction bid.',
     'marketplace_bid.field.bidder' => 'The account who placed the bid.',

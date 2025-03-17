@@ -52,7 +52,7 @@ class CreateListingTest extends TestCaseGraphQL
 
         $this->assertEquals(
             $response['encodedData'],
-            TransactionSerializer::encode($this->method, CreateListingMutation::getEncodableParams(...$params))
+            TransactionSerializer::encode($this->method . (currentSpec() >= 1020 ? '' : 'V1013'), CreateListingMutation::getEncodableParams(...$params))
         );
 
         $this->assertNull(Arr::get($response, 'wallet.account.publicKey'));
@@ -132,7 +132,6 @@ class CreateListingTest extends TestCaseGraphQL
                 'listingData' => [
                     'type' => ListingType::AUCTION->name,
                     'auctionParams' => [
-                        'startBlock' => fake()->numberBetween(1011, 5000),
                         'endBlock' => fake()->numberBetween(5001, 10000),
                     ],
                 ],
@@ -427,6 +426,9 @@ class CreateListingTest extends TestCaseGraphQL
             array_merge($data, ['salt' => '']),
             true
         );
+
+        ray($response['error']);
+
         $this->assertArrayContainsArray(
             ['salt' => ['The salt field must have a value.']],
             $response['error']
@@ -485,22 +487,6 @@ class CreateListingTest extends TestCaseGraphQL
             array_merge($data, ['listingData' => [
                 'type' => ListingType::AUCTION->name,
                 'auctionParams' => [
-                    'startBlock' => null,
-                    'endBlock' => fake()->numberBetween(1011, 2000),
-                ],
-            ]]),
-            true
-        );
-        $this->assertStringContainsString(
-            'invalid value null at "listingData.auctionParams.startBlock"',
-            $response['error']
-        );
-
-        $response = $this->graphql(
-            $this->method,
-            array_merge($data, ['listingData' => [
-                'type' => ListingType::AUCTION->name,
-                'auctionParams' => [
                     'startBlock' => Hex::MAX_UINT128 + 1,
                     'endBlock' => Hex::MAX_UINT128 + 1,
                 ],
@@ -529,26 +515,6 @@ class CreateListingTest extends TestCaseGraphQL
         );
         $this->assertArrayContainsArray(
             ['listingData.auctionParams.startBlock' => ['The listing data.auction params.start block must be at least 1010.']],
-            $response['error']
-        );
-
-        $response = $this->graphql(
-            $this->method,
-            array_merge($data, ['listingData' => [
-                'type' => ListingType::AUCTION->name,
-                'auctionParams' => [
-                    'startBlock' => 1012,
-                    'endBlock' => 1011,
-                ],
-            ]]),
-            true
-        );
-        $this->assertArrayContainsArray(
-            [
-                'listingData.auctionParams.endBlock' => [
-                    'The listing data.auction params.end block field must be greater than 1012.',
-                ],
-            ],
             $response['error']
         );
     }

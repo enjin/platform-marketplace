@@ -8,8 +8,8 @@ class AuctionDataParams
      * Create a new instance of the model.
      */
     public function __construct(
-        public int $startBlock,
         public int $endBlock,
+        public ?int $startBlock = null,
     ) {}
 
     /**
@@ -17,6 +17,15 @@ class AuctionDataParams
      */
     public function toEncodable(): array
     {
-        return ['startBlock' => $this->startBlock, 'endBlock' => $this->endBlock];
+        if (currentSpec() >= 1020) {
+            return [
+                'endBlock' => $this->endBlock,
+            ];
+        }
+
+        return [
+            'startBlock' => $this->startBlock,
+            'endBlock' => $this->endBlock
+        ];
     }
 }
