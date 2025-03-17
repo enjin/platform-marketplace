@@ -46,7 +46,6 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
     /**
      * Get the mutation's attributes.
      */
-    #[\Override]
     public function attributes(): array
     {
         return [
@@ -58,7 +57,6 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
     /**
      * Get the mutation's return type.
      */
-    #[\Override]
     public function type(): Type
     {
         return GraphQL::type('Transaction!');
@@ -67,7 +65,6 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
     /**
      * Get the mutation's arguments definition.
      */
-    #[\Override]
     public function args(): array
     {
         return [
@@ -112,7 +109,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         ResolveInfo $resolveInfo,
         Closure $getSelectFields,
     ) {
-        $encodedData = TransactionSerializer::encode($this->getMutationName(), static::getEncodableParams(
+        $encodedData = TransactionSerializer::encode($this->getMutationName() . (currentSpec() >= 1020 ? '' : 'V1013'), static::getEncodableParams(
             makeAssetId: new MultiTokensTokenAssetIdParams(
                 Arr::get($args, 'makeAssetId.collectionId'),
                 $this->encodeTokenId(Arr::get($args, 'makeAssetId'))
@@ -133,7 +130,6 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         );
     }
 
-    #[\Override]
     public static function getEncodableParams(...$params): array
     {
         $makeAsset = Arr::get($params, 'makeAssetId', new MultiTokensTokenAssetIdParams('0', '0'));
@@ -159,7 +155,9 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
             'takeAssetId' => $takeAsset->toEncodable(),
             'amount' => gmp_init($amount),
             'price' => gmp_init($price),
+            'startBlock' => null, // TODO: New feature from v1020, to be implemented
             'salt' => HexConverter::stringToHexPrefixed($salt),
+            'usesWhitelist' => false, // TODO: New feature from v1020, to be implemented
             'listingData' => $listingData->toEncodable(),
             'depositor' => null,
         ];
