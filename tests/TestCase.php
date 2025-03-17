@@ -41,8 +41,6 @@ abstract class TestCase extends BaseTestCase
         $app->useDatabasePath(__DIR__ . '/../database');
         $app->bootstrapWith([LoadEnvironmentVariables::class]);
 
-        ray($app['config']);
-
         Cache::rememberForever(PlatformCache::SPEC_VERSION->key(currentMatrix()->value), fn () => 1020);
         Cache::rememberForever(PlatformCache::TRANSACTION_VERSION->key(currentMatrix()->value), fn () => 11);
 

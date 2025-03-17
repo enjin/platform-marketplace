@@ -25,7 +25,7 @@ class AuctionDataParams
 
         return [
             'startBlock' => $this->startBlock,
-            'endBlock' => $this->endBlock
+            'endBlock' => $this->endBlock,
         ];
     }
 }

@@ -427,8 +427,6 @@ class CreateListingTest extends TestCaseGraphQL
             true
         );
 
-        ray($response['error']);
-
         $this->assertArrayContainsArray(
             ['salt' => ['The salt field must have a value.']],
             $response['error']
