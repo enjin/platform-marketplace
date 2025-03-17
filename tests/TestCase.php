@@ -3,9 +3,11 @@
 namespace Enjin\Platform\Marketplace\Tests;
 
 use Enjin\Platform\CoreServiceProvider;
+use Enjin\Platform\Enums\Global\PlatformCache;
 use Enjin\Platform\Marketplace\MarketplaceServiceProvider;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
@@ -38,6 +40,9 @@ abstract class TestCase extends BaseTestCase
         $app->useEnvironmentPath(__DIR__ . '/..');
         $app->useDatabasePath(__DIR__ . '/../database');
         $app->bootstrapWith([LoadEnvironmentVariables::class]);
+
+        Cache::rememberForever(PlatformCache::SPEC_VERSION->key(currentMatrix()->value), fn () => 1020);
+        Cache::rememberForever(PlatformCache::TRANSACTION_VERSION->key(currentMatrix()->value), fn () => 11);
 
         $app['config']->set('database.default', env('DB_DRIVER', 'mysql'));
 

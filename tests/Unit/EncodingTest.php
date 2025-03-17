@@ -33,6 +33,7 @@ class EncodingTest extends TestCase
             amount: 1,
             price: 1,
             salt: 'test',
+            startBlock: 100,
             listingData: ['type' => ListingType::AUCTION->name, 'auctionParams' => [
                 'startBlock' => 100,
                 'endBlock' => 1000,
@@ -41,7 +42,7 @@ class EncodingTest extends TestCase
 
         $callIndex = $this->codec->encoder()->getCallIndex('Marketplace.create_listing', true);
         $this->assertEquals(
-            "0x{$callIndex}4277010004427701000404041074657374019101a10f00",
+            "0x{$callIndex}427701000442770100040404016400000010746573740001a10f00",
             $data
         );
     }

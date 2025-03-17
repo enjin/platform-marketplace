@@ -23,10 +23,10 @@ trait CreateListingParameters
             'amount' => fake()->numberBetween(1, 1000),
             'price' => fake()->numberBetween(1, 1000),
             'salt' => fake()->text(10),
+            'startBlock' => fake()->numberBetween(1011, 5000),
             'listingData' => [
                 'type' => ListingType::AUCTION->name,
                 'auctionParams' => [
-                    'startBlock' => fake()->numberBetween(1011, 5000),
                     'endBlock' => fake()->numberBetween(5001, 10000),
                 ],
             ],

@@ -24,24 +24,24 @@
         "ext-json": "*",
         "ext-openssl": "*",
         "ext-gmp": "*",
-        "enjin/platform-core": "*",
+        "enjin/platform-core": "dev-master",
         "rebing/graphql-laravel": "*",
         "spatie/laravel-package-tools": "*",
         "phrity/websocket": "*"
     },
     "require-dev": {
-        "laravel/pint": "^1.19",
-        "nunomaduro/collision": "^8.5",
-        "larastan/larastan": "^3.0",
-        "orchestra/testbench": "^9.9",
+        "laravel/pint": "^1.21",
+        "nunomaduro/collision": "^8.7",
+        "larastan/larastan": "^3.2",
+        "orchestra/testbench": "^9.12",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpunit/php-code-coverage": "^11.0",
-        "phpunit/phpunit": "^11.0",
+        "phpunit/phpunit": "^11.5",
         "rector/rector": "^2.0",
         "roave/security-advisories": "dev-latest",
-        "spatie/laravel-ray": "^1.39"
+        "spatie/laravel-ray": "^1.40"
     },
     "autoload": {
         "psr-4": {

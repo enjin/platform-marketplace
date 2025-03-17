@@ -58,7 +58,6 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
     /**
      * Get the mutation's return type.
      */
-    #[\Override]
     public function type(): Type
     {
         return GraphQL::type('Transaction!');
@@ -87,6 +86,10 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 'type' => GraphQL::type('BigInt!'),
                 'description' => __('enjin-platform-marketplace::type.marketplace_listing.field.price'),
             ],
+            'startBlock' => [
+                'type' => GraphQL::type('Int'),
+                'description' => __('enjin-platform-marketplace::type.marketplace_listing.field.startBlock'),
+            ],
             'salt' => [
                 'type' => GraphQL::type('String'),
                 'description' => __('enjin-platform-marketplace::type.marketplace_listing.field.salt'),
@@ -112,7 +115,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         ResolveInfo $resolveInfo,
         Closure $getSelectFields,
     ) {
-        $encodedData = TransactionSerializer::encode($this->getMutationName(), static::getEncodableParams(
+        $encodedData = TransactionSerializer::encode($this->getMutationName() . (currentSpec() >= 1020 ? '' : 'V1013'), static::getEncodableParams(
             makeAssetId: new MultiTokensTokenAssetIdParams(
                 Arr::get($args, 'makeAssetId.collectionId'),
                 $this->encodeTokenId(Arr::get($args, 'makeAssetId'))
@@ -121,6 +124,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 Arr::get($args, 'takeAssetId.collectionId'),
                 $this->encodeTokenId(Arr::get($args, 'takeAssetId'))
             ),
+            startBlock: Arr::get($args, 'startBlock') ?? Arr::get($args, 'listingData.auctionParams.startBlock'),
             amount: Arr::get($args, 'amount'),
             price: Arr::get($args, 'price'),
             salt: Arr::get($args, 'salt', Str::random(10)),
@@ -138,6 +142,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
     {
         $makeAsset = Arr::get($params, 'makeAssetId', new MultiTokensTokenAssetIdParams('0', '0'));
         $takeAsset = Arr::get($params, 'takeAssetId', new MultiTokensTokenAssetIdParams('0', '0'));
+        $startBlock = Arr::get($params, 'startBlock');
         $amount = Arr::get($params, 'amount', 0);
         $price = Arr::get($params, 'price', 0);
         $salt = Arr::get($params, 'salt', Str::random(10));
@@ -159,7 +164,9 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
             'takeAssetId' => $takeAsset->toEncodable(),
             'amount' => gmp_init($amount),
             'price' => gmp_init($price),
+            'startBlock' => $startBlock,
             'salt' => HexConverter::stringToHexPrefixed($salt),
+            'usesWhitelist' => false, // TODO: New feature from v1020, to be implemented
             'listingData' => $listingData->toEncodable(),
             'depositor' => null,
         ];
@@ -227,8 +234,8 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
             ListingType::AUCTION => [
                 'listingData.auctionParams' => ['required'],
                 'listingData.offerParams' => ['prohibited'],
-                'listingData.auctionParams.startBlock' => ['bail', 'required', new MinBigInt(), new MaxBigInt(Hex::MAX_UINT32), new FutureBlock()],
-                'listingData.auctionParams.endBlock' => ['bail', 'required',  new MinBigInt(), new MaxBigInt(Hex::MAX_UINT32), 'gt:listingData.auctionParams.startBlock', new FutureBlock()],
+                'listingData.auctionParams.startBlock' => ['bail', 'nullable', new MinBigInt(), new MaxBigInt(Hex::MAX_UINT32), new FutureBlock()],
+                'listingData.auctionParams.endBlock' => ['bail', 'required',  new MinBigInt(), new MaxBigInt(Hex::MAX_UINT32), new FutureBlock()],
             ],
             ListingType::OFFER => [
                 'listingData.offerParams' => ['required'],
@@ -254,6 +261,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 new MaxBigInt(),
                 new EnoughTokenSupply(),
             ],
+            'startBlock' => ['bail', 'nullable', new MinBigInt(), new MaxBigInt(Hex::MAX_UINT32), new FutureBlock()],
             ...$extras,
         ];
     }
@@ -270,8 +278,8 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
             ListingType::AUCTION => [
                 'listingData.auctionParams' => ['required'],
                 'listingData.offerParams' => ['prohibited'],
-                'listingData.auctionParams.startBlock' => ['bail', 'required', new MinBigInt(), new MaxBigInt(Hex::MAX_UINT32)],
-                'listingData.auctionParams.endBlock' => ['bail', 'required',  new MinBigInt(), new MaxBigInt(Hex::MAX_UINT32), 'gt:listingData.auctionParams.startBlock'],
+                'listingData.auctionParams.startBlock' => ['bail', 'nullable', new MinBigInt(), new MaxBigInt(Hex::MAX_UINT32)],
+                'listingData.auctionParams.endBlock' => ['bail', 'required',  new MinBigInt(), new MaxBigInt(Hex::MAX_UINT32)],
             ],
             ListingType::OFFER => [
                 'listingData.offerParams' => ['required'],
@@ -294,6 +302,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
                 new MinBigInt(1),
                 new MaxBigInt(),
             ],
+            'startBlock' => ['bail', 'nullable', new MinBigInt(), new MaxBigInt(Hex::MAX_UINT32)],
             ...$extras,
         ];
     }

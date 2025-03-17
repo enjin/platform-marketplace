@@ -4,6 +4,7 @@ mutation CreateListing(
   $amount: BigInt!
   $price: BigInt!
   $salt: String!
+  $startBlock: Int
   $listingData: ListingDataInput!
   $signingAccount: String
   $skipValidation: Boolean
@@ -14,6 +15,7 @@ mutation CreateListing(
     amount: $amount
     price: $price
     salt: $salt
+    startBlock: $startBlock
     listingData: $listingData
     signingAccount: $signingAccount
     skipValidation: $skipValidation
