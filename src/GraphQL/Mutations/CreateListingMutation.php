@@ -46,6 +46,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
     /**
      * Get the mutation's attributes.
      */
+    #[\Override]
     public function attributes(): array
     {
         return [
@@ -65,6 +66,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
     /**
      * Get the mutation's arguments definition.
      */
+    #[\Override]
     public function args(): array
     {
         return [
@@ -130,6 +132,7 @@ class CreateListingMutation extends Mutation implements PlatformBlockchainTransa
         );
     }
 
+    #[\Override]
     public static function getEncodableParams(...$params): array
     {
         $makeAsset = Arr::get($params, 'makeAssetId', new MultiTokensTokenAssetIdParams('0', '0'));
