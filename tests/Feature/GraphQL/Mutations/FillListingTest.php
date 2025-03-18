@@ -37,6 +37,7 @@ class FillListingTest extends TestCaseGraphQL
             $this->method,
             $params = ['listingId' => '0x' . fake()->regexify('[a-f0-9]{64}'), 'amount' => fake()->numberBetween(1, 1000), 'skipValidation' => true]
         );
+
         $this->assertEquals(
             $response['encodedData'],
             TransactionSerializer::encode($this->method, FillListingMutation::getEncodableParams(...$params))

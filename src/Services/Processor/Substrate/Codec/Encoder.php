@@ -11,7 +11,9 @@ class Encoder extends BaseEncoder
         'CreateListingV1013' => 'Marketplace.create_listing',
         'CancelListing' => 'Marketplace.cancel_listing',
         'FillListing' => 'Marketplace.fill_listing',
+        'FillListingV1013' => 'Marketplace.fill_listing',
         'FinalizeAuction' => 'Marketplace.finalize_auction',
+        'FinalizeAuctionV1013' => 'Marketplace.finalize_auction',
         'PlaceBid' => 'Marketplace.place_bid',
         'SetProtocolFee' => 'Marketplace.set_protocol_fee',
     ];

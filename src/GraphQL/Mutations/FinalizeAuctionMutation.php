@@ -13,6 +13,7 @@ use Enjin\Platform\GraphQL\Types\Input\Substrate\Traits\HasSigningAccountField;
 use Enjin\Platform\GraphQL\Types\Input\Substrate\Traits\HasSimulateField;
 use Enjin\Platform\Interfaces\PlatformBlockchainTransaction;
 use Enjin\Platform\Marketplace\Rules\ListingNotCancelled;
+use Facades\Enjin\Platform\Marketplace\Services\MarketplaceService;
 use Enjin\Platform\Models\Transaction;
 use Enjin\Platform\Rules\ValidHex;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -79,7 +80,7 @@ class FinalizeAuctionMutation extends Mutation implements PlatformBlockchainTran
         ResolveInfo $resolveInfo,
         Closure $getSelectFields,
     ) {
-        $encodedData = TransactionSerializer::encode($this->getMutationName(), static::getEncodableParams(...$args));
+        $encodedData = TransactionSerializer::encode($this->getMutationName() . (currentSpec() >= 1020 ? '' : 'V1013'), static::getEncodableParams(...$args));
 
         return Transaction::lazyLoadSelectFields(
             DB::transaction(fn () => $this->storeTransaction($args, $encodedData)),
@@ -90,8 +91,11 @@ class FinalizeAuctionMutation extends Mutation implements PlatformBlockchainTran
     #[\Override]
     public static function getEncodableParams(...$params): array
     {
+        $count = MarketplaceService::getRoyaltyBeneficiaryCount($listingId = Arr::get($params, 'listingId'));
+
         return [
-            'listingId' => HexConverter::unPrefix(Arr::get($params, 'listingId', 0)),
+            'listingId' => HexConverter::unPrefix($listingId),
+            'royaltyBeneficiaryCount' => $count,
         ];
     }
 
