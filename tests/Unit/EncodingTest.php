@@ -69,7 +69,7 @@ class EncodingTest extends TestCase
 
         $callIndex = $this->codec->encoder()->getCallIndex('Marketplace.fill_listing', true);
         $this->assertEquals(
-            "0x{$callIndex}002ddf91ca0f13b03541dbddb3a008d8efc975b0044fde799ea7ffe33fdf57f7a10f",
+            "0x{$callIndex}002ddf91ca0f13b03541dbddb3a008d8efc975b0044fde799ea7ffe33fdf57f7a10f00000000",
             $data
         );
     }

@@ -88,7 +88,7 @@ class FillListingMutation extends Mutation implements PlatformBlockchainTransact
         ResolveInfo $resolveInfo,
         Closure $getSelectFields,
     ) {
-        $encodedData = TransactionSerializer::encode($this->getMutationName() . currentSpec() >= 1020 ? '' : 'V1013', static::getEncodableParams(...$args));
+        $encodedData = TransactionSerializer::encode($this->getMutationName() . (currentSpec() >= 1020 ? '' : 'V1013'), static::getEncodableParams(...$args));
 
         return Transaction::lazyLoadSelectFields(
             DB::transaction(fn () => $this->storeTransaction($args, $encodedData)),
@@ -103,9 +103,9 @@ class FillListingMutation extends Mutation implements PlatformBlockchainTransact
         $royaltyCount = 0;
         if (currentSpec() >= 1020) {
             $listing = MarketplaceListing::firstWhere('id', $listingId);
-            $makeCollection = Collection::firstWhere('collection_chain_id', $listing->make_collection_chain_id);
-            $makeToken = Token::firstWhere(['collection_id' => $makeCollection->id, 'token_chain_id' => $listing->make_token_chain_id]);
-            if ($makeCollection->royalty_wallet_id !== null || $makeToken->royalty_wallet_id !== null) {
+            $makeCollection = Collection::firstWhere('collection_chain_id', $listing?->make_collection_chain_id);
+            $makeToken = Token::firstWhere(['collection_id' => $makeCollection?->id, 'token_chain_id' => $listing?->make_token_chain_id]);
+            if ($makeCollection?->royalty_wallet_id !== null || $makeToken?->royalty_wallet_id !== null) {
                 $royaltyCount = 1;
             }
         }
