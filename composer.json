@@ -24,7 +24,7 @@
         "ext-json": "*",
         "ext-openssl": "*",
         "ext-gmp": "*",
-        "enjin/platform-core": "dev-master",
+        "enjin/platform-core": "*",
         "rebing/graphql-laravel": "*",
         "spatie/laravel-package-tools": "*",
         "phrity/websocket": "*"
